@@ -15,11 +15,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="openGL_Main.cpp">
+    <ClCompile Include="openGLLearning01_HelloWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Dependencys\src\glad.c">
       <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning02_HelloTriangle.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning02_GLSL_Shader.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
