@@ -24,8 +24,19 @@
     <ClCompile Include="openGLLearning02_HelloTriangle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="openGLLearning02_GLSL_Shader.cpp">
+    <ClCompile Include="openGLLearning03_GLSL_Shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning04_ShaderClass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

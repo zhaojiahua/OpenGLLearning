@@ -138,9 +138,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dependencys\src\glad.c" />
-    <ClCompile Include="openGLLearning02_GLSL_Shader.cpp" />
+    <ClCompile Include="openGLLearning03_GLSL_Shader.cpp" />
     <ClCompile Include="openGLLearning02_HelloTriangle.cpp" />
     <ClCompile Include="openGLLearning01_HelloWindow.cpp" />
+    <ClCompile Include="openGLLearning04_ShaderClass.cpp" />
+    <ClCompile Include="Shader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
