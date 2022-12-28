@@ -1,6 +1,5 @@
 #version 330 core
 in vec4 vertexColor;
-in vec3 vertexPos;
 in vec2 vertexUV;
 out vec4 fragColor;
 uniform sampler2D myTexture1;

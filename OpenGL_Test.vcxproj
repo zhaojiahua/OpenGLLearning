@@ -143,6 +143,7 @@
     <ClCompile Include="openGLLearning01_HelloWindow.cpp" />
     <ClCompile Include="openGLLearning04_ShaderClass.cpp" />
     <ClCompile Include="openGLLearning05_Texture.cpp" />
+    <ClCompile Include="openGLLearning06_Transform.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
