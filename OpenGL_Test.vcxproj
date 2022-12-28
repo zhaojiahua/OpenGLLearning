@@ -142,10 +142,12 @@
     <ClCompile Include="openGLLearning02_HelloTriangle.cpp" />
     <ClCompile Include="openGLLearning01_HelloWindow.cpp" />
     <ClCompile Include="openGLLearning04_ShaderClass.cpp" />
+    <ClCompile Include="openGLLearning05_Texture.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

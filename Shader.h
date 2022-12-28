@@ -23,5 +23,5 @@ public:
 	void SetBool(const std::string& inname, bool invalue) const;
 	void SetInt(const std::string& inname, int invalue) const;
 	void SetFloat(const std::string& inname, float invalue) const;
-	void SetVec4f(const std::string& inname, std::vector<float> invalue) const;
+	void SetVec4f(const std::string& inname, float invalue[4]) const;
 };
