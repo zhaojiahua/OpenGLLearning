@@ -15,9 +15,58 @@
 //using namespace std;
 //
 //
+////设置屏幕宽高
+//unsigned int screenWidth = 800;
+//unsigned int screenHeight = 600;
+////计算deltaTime
+//float deltaTime = 0.0f;
+//float lastFrame = 0.0f;
+//
+////定义全局变量用来改变相机位置
+//glm::vec3 cameraPos = { 0.0f,0.0f,3.0f };
+//glm::vec3 cameraUp = { 0.0f,1.0f,0.0f };
+//glm::vec3 cameraFront = { 0.0f,0.0f,-1.0f };
+//float cameraMoveSpeed = 0.001f;
+//
+////设置鼠标初始位置(鼠标的起始位置设置带屏幕的中心)
+//float lastX = screenWidth / 2, lastY = screenHeight / 2;
+//float sensitivity = 0.05f;	//鼠标灵敏度
+//float yaw = 0.0f;
+//float pitch = 0.0f;
+//bool firstMouse = true;//第一次移动鼠标
+//
+//float g_fov = 45.0f;//初始相机视角为45度
+//
 ////窗口大小发生变化时候的回调函数
 //void Framebuffer_size_callback(GLFWwindow* inWind, int inWidth, int inHeight) {
 //	glViewport(0, 20, inWidth, inHeight - 40);
+//}
+////鼠标移动回调函数
+//void Mouse_move_callback(GLFWwindow* inWind, double xpos, double ypos) {
+//	if (firstMouse) {
+//		lastX = xpos;
+//		lastY = ypos;
+//		firstMouse = false;
+//	}
+//	float xoffset = (xpos - lastX)*sensitivity;
+//	float yoffset = (ypos - lastY)*sensitivity;
+//	lastX = xpos;
+//	lastY = ypos;
+//	yaw += xoffset;
+//	pitch -= yoffset;
+//	if (pitch > 89.0f)pitch = 89.0f;
+//	if (pitch < -89.0f)pitch = -89.0f;
+//	glm::vec3 tempFront;
+//	tempFront.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+//	tempFront.y = sin(glm::radians(pitch));
+//	tempFront.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+//	cameraFront = tempFront;
+//}
+////鼠标滚轮回调函数
+//void Mouse_scroll_callback(GLFWwindow* inWind, double xoffset, double yoffset) {
+//	if (g_fov >= 1.0f && g_fov <= 60.0f) g_fov -= yoffset;
+//	if (g_fov < 1.0f)g_fov = 1.0f;
+//	if (g_fov > 60.0f)g_fov = 60.0f;
 //}
 //
 ////输入响应函数
@@ -39,15 +88,20 @@
 //		if (tempvalue < 0.0f) tempvalue = 0.0f;
 //		inshader.SetFloat("mixValue", tempvalue);
 //	}
+//	if (glfwGetKey(inWind, GLFW_KEY_W) == GLFW_PRESS) {//W键按下相机向前运动
+//		cameraPos += cameraFront * cameraMoveSpeed;
+//	}
+//	if (glfwGetKey(inWind, GLFW_KEY_S) == GLFW_PRESS) {//S键按下相机向后运动
+//		cameraPos -= cameraFront * cameraMoveSpeed;
+//	}
+//	if (glfwGetKey(inWind, GLFW_KEY_A) == GLFW_PRESS) {//A键按下相机向左运动
+//		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraMoveSpeed;
+//	}
+//	if (glfwGetKey(inWind, GLFW_KEY_D) == GLFW_PRESS) {//D键按下相机向右运动
+//		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraMoveSpeed;
+//	}
 //}
 //
-//void TestGLM() {
-//	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-//	glm::mat4 trans = glm::mat4(1.0f);
-//	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-//	vec = trans * vec;
-//	cout << vec.x << vec.y << vec.z << endl;
-//}
 //
 //int main()
 //{
@@ -58,13 +112,15 @@
 //	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 //
 //	//创建一个窗口于对象,这个窗口对象存放了和所有窗口相关的数据,而且会被频繁用到
-//	GLFWwindow* window = glfwCreateWindow(800, 600, "ZJHOpenGL", NULL, NULL);
+//	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "ZJHOpenGL", NULL, NULL);
 //	if (window == nullptr) {
 //		cout << "Failed to create GLFW window" << endl;
 //		glfwTerminate();	//如果窗口创建失败,glfw停止工作,结束当前线程
 //		return -1;
 //	}
 //	glfwMakeContextCurrent(window);	//将此窗口的上下文设置成当前线程的主上下文
+//
+//	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//设置隐藏鼠标
 //
 //	//GLAD是用来管理OpenGL的函数指针的,所以在调用任何OpenGL的函数之前我们需要初始化GLAD
 //	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -78,19 +134,47 @@
 //
 //	//当用户改变窗口的大小的时候视口大小也要相应的变化,我们注册一个回调函数,它会在每次窗口大小发生变化的时候被调用
 //	glfwSetFramebufferSizeCallback(window, Framebuffer_size_callback);	//注册这个函数,告诉GLFW每当窗口发小调整的时候调用这个函数(窗口第一次显示的时候这个函数也会被调用)
-//
+//	glfwSetCursorPosCallback(window, Mouse_move_callback);//告诉GLFW当鼠标移动的时候调用这个函数
+//	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
 //	//自定义一个顶点数组
-//	float vertices[] = {//一个三角形数据
-//	0.5f, 0.5f, 0.0f,			1.0f,0.0f,0.0f,	4.0f,4.0f,		// 右上角
-//	0.5f, -0.5f, 0.0f,			0.0f,1.0f,0.0f,	4.0f,0.0f,		// 右下角
-//	-0.5f, -0.5f, 0.0f,		0.0f,0.0f,1.0f,	0.0f,0.0f,		// 左下角
-//	-0.5f, 0.5f, 0.0f,			1.0f,1.0f,1.0f,	0.0f,4.0f		// 左上角
+//	float vertices[] = {//一个box数据 pos uv
+//	-0.5f, -0.5f,   0.5f,			0.0f,0.0f,
+//	0.5f,  -0.5f,   0.5f,			0.0f,1.0f,
+//	-0.5f,  0.5f,   0.5f,			1.0f,0.0f,
+//	  0.5f,  0.5f,   0.5f,			1.0f,1.0f,
+//	-0.5f,   0.5f, -0.5f,			1.0f,1.0f,
+//	  0.5f,   0.5f, -0.5f,			1.0f,0.0f,
+//	 -0.5f, -0.5f, -0.5f,			0.0f,1.0f,
+//	0.5f,   -0.5f,   -0.5f,		0.0f,0.0f
 //	};
 //
 //	//顶点索引缓冲
 //	unsigned int indices[] = {
-//		0,1,3,	//第一个三角形
-//		1,2,3		//第二个三角形
+//		0,2,1,	//0
+//		2,3,1	,	//1
+//		2,4,3,	//2
+//		4,5,3,	//3
+//		4,6,5,	//4
+//		6,7,5,	//5
+//		6,0,7,	//6
+//		0,1,7,	//7
+//		1,3,7,	//8
+//		3,5,7,	//9
+//		6,4,0,	//10
+//		4,2,0		//11
+//	};
+//
+//	glm::vec3 boxPositions[10] = {
+//		glm::vec3(0.0f,  0.0f,  0.0f),
+//		glm::vec3(2.0f,  5.0f, -15.0f),
+//		glm::vec3(-1.5f, -2.2f, -2.5f),
+//		glm::vec3(-3.8f, -2.0f, -12.3f),
+//		glm::vec3(2.4f, -0.4f, -3.5f),
+//		glm::vec3(-1.7f,  3.0f, -7.5f),
+//		glm::vec3(1.3f, -2.0f, -2.5f),
+//		glm::vec3(1.5f,  2.0f, -2.5f),
+//		glm::vec3(1.5f,  0.2f, -1.5f),
+//		glm::vec3(-1.3f,  1.0f, -1.5f)
 //	};
 //
 //	//创建一个顶点缓冲对象和顶点数组对象和一个元素缓冲对象
@@ -112,12 +196,10 @@
 //	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 //	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 //	//设置顶点属性指针
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 //	glEnableVertexAttribArray(0);
-//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 //	glEnableVertexAttribArray(1);
-//	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-//	glEnableVertexAttribArray(2);
 //	//解绑
 //	glBindBuffer(GL_ARRAY_BUFFER, 0);
 //	glBindVertexArray(0);
@@ -169,18 +251,38 @@
 //	myShader1.SetInt("myTexture1", 0);
 //	myShader1.SetInt("myTexture2", 1);
 //
-//	glm::mat4 trans = glm::mat4(1.0f);
-//	trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-//	trans = glm::translate(trans, glm::vec3(0.5f, 0.5f, 0.0f));
+//	//模型矩阵(model matrix)
+//	glm::mat4 m_matrix = glm::mat4(1.0f);
+//	//m_matrix = glm::rotate(m_matrix, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+//	//观察矩阵(view matrix)
+//	glm::mat4 v_matrix = glm::mat4(1.0f);
+//	//v_matrix = glm::translate(v_matrix, glm::vec3(0.0f, 0.0f, -3.0f));
+//	//透视投影矩阵(perspective matrix)
+//	glm::mat4 p_matrix = glm::mat4(1.0f);
+//	//p_matrix = glm::perspective(glm::radians(45.0f), static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 500.0f);
+//
+//	//将矩阵传递给shader
+//	//glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(m_matrix));
+//	//glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(v_matrix));
+//	//glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(p_matrix));
+//
+//	//开启深度测试
+//	glEnable(GL_DEPTH_TEST);
 //
 //	//保持渲染循环
 //	while (!glfwWindowShouldClose(window)) {	//如果检测到GLFW要求被关闭就结束循环
 //		ProcessInput(window, myShader1);	//按键响应
+//		float currentFrame = glfwGetTime();
+//		deltaTime = currentFrame - lastFrame;
+//		lastFrame = currentFrame;
+//		cameraMoveSpeed = 25.0f * deltaTime;
 //
 //		//渲染指令
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
-//		glClear(GL_COLOR_BUFFER_BIT);	//此函数会用flClearColor里的颜色填充整个颜色缓冲区
+//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除颜色缓冲和深度缓冲
 //
+//		/*m_matrix = glm::rotate(m_matrix, (float)glfwGetTime()*glm::radians(0.002f), glm::vec3(0.5f, 1.0f, 0.0f));
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(m_matrix));*/
 //		//激活这个程序对象
 //		myShader1.Use();
 //		glActiveTexture(GL_TEXTURE0);//激活第0号采样器(默认被激活)
@@ -189,11 +291,24 @@
 //		glBindTexture(GL_TEXTURE_2D, textures[1]);	//绑定第二个texture到第1号采样器
 //		glBindVertexArray(VAO);//每次绘制都绑定一次VAO
 //		//glDrawArrays(GL_TRIANGLES, 0, 3);
-//		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//		/*float radius = 10.0f;
+//		float cameraX = sin(glfwGetTime()) * radius;
+//		float cameraZ = cos(glfwGetTime()) * radius;*/
+//		//v_matrix = glm::lookAt(glm::vec3(cameraX, 0.0f, cameraZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+//		v_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(v_matrix));
+//		p_matrix = glm::perspective(glm::radians(g_fov), static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 500.0f);
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(p_matrix));
+//		for (auto pos : boxPositions) {
+//			glm::mat4 modelM = glm::mat4(1.0f);
+//			modelM = glm::translate(modelM, pos);
+//			float initAngle = 20.0f * pos.x;
+//			modelM = glm::rotate(modelM, (float)(glm::radians(initAngle) * glfwGetTime()), glm::vec3(1.0f, 0.5f, 0.0f));
+//			glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(modelM));
+//			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+//		}
 //		glBindVertexArray(0);//解绑
 //
-//		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "transf"), 1, GL_FALSE, glm::value_ptr(trans));
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数

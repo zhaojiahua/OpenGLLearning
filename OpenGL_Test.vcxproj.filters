@@ -39,12 +39,30 @@
     <ClCompile Include="openGLLearning06_Transform.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="openGLLearning07_3DSpace.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning08_Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning09_CameraClass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZCamera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning10_LightColor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZCamera.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
