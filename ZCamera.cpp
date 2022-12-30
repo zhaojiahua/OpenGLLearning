@@ -66,3 +66,13 @@ void ZCamera::MoveRight()
 {
 	cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraMoveSpeed;
 }
+
+void ZCamera::MoveUpWard()
+{
+	cameraPos += cameraUp * cameraMoveSpeed;
+}
+
+void ZCamera::MoveDownWard()
+{
+	cameraPos -= cameraUp * cameraMoveSpeed;
+}

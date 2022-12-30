@@ -21,7 +21,7 @@
 //ZCamera zcamera(45.0f, static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 500.0f);
 //
 ////设置光源的位置和颜色
-//float g_lightColor[3] = { 1.0f,0.9f,0.7f };
+//glm::vec3 g_lightColor = { 1.0f,0.9f,0.1f };
 //glm::vec3 g_lightPos = { 1.2f,1.0f,2.0f };
 //
 ////设置鼠标初始位置(鼠标的起始位置设置带屏幕的中心)
@@ -123,7 +123,7 @@
 //	glfwSetFramebufferSizeCallback(window, Framebuffer_size_callback);	//注册这个函数,告诉GLFW每当窗口发小调整的时候调用这个函数(窗口第一次显示的时候这个函数也会被调用)
 //	glfwSetCursorPosCallback(window, Mouse_move_callback);//告诉GLFW当鼠标移动的时候调用这个函数
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
-//	
+//
 //	//自定义一个顶点数组
 //	float vertices[] = {//一个box数据 pos	normal		uv
 //	-0.5f,-0.5f,0.5f , 0.0f,0.0f,1.0f , 0.0f,0.0f,
@@ -209,7 +209,7 @@
 //	glBindVertexArray(0);
 //
 //	//创建顶点着色器
-//	Shader myShader1("shaders/openGLLearning10/vertexShader.vs", "shaders/openGLLearning10/fragmentShader1.fs");
+//	Shader myShader1("shaders/openGLLearning11/vertexShader.vs.c", "shaders/openGLLearning11/fragmentShader1.fs.c");
 //	Shader myShader1_L("shaders/openGLLearning10/vertexShader_forlight.vs", "shaders/openGLLearning10/fragmentShader1_forlight.fs");
 //
 //	//纹理
@@ -255,8 +255,13 @@
 //	myShader1.Use();
 //	myShader1.SetInt("myTexture1", 0);
 //	myShader1.SetInt("myTexture2", 1);
-//	myShader1.SetVec3f("lightColor", g_lightColor);
-//	myShader1.SetVec3f("lightPos", g_lightPos);
+//	myShader1.SetVec3f("light.position", g_lightPos);
+//
+//	myShader1.SetVec3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31));
+//	myShader1.SetVec3f("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31));
+//	myShader1.SetVec3f("material.specular", glm::vec3(0.6f, 0.5f, 0.4));
+//	myShader1.SetFloat("material.shininess", 64.0f);
+//	
 //	glm::mat4 modelM = glm::mat4(1.0f);
 //	modelM = glm::rotate(modelM, (float)glm::radians(10.0f), glm::vec3(1.0f, 0.5f, 0.0f));
 //	glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(modelM));
@@ -266,7 +271,6 @@
 //	modelM_L = glm::scale(modelM_L, glm::vec3(0.2f));
 //	myShader1_L.Use();
 //	glUniformMatrix4fv(glGetUniformLocation(myShader1_L.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(modelM_L));
-//	myShader1_L.SetVec4f("lightColor", g_lightColor);
 //
 //	//开启深度测试
 //	glEnable(GL_DEPTH_TEST);
@@ -295,14 +299,21 @@
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
+//		g_lightColor.x = sin(glfwGetTime() * 1.7f);
+//		g_lightColor.y = sin(glfwGetTime() * 2.3f);
+//		g_lightColor.z = sin(glfwGetTime() * 0.7f);
+//		myShader1.SetVec3f("light.ambient", g_lightColor * 0.1f);
+//		myShader1.SetVec3f("light.diffuse", g_lightColor*0.5f);
+//		myShader1.SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 //		//绘制被照射的箱子
 //		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 //		glBindVertexArray(0);//解绑
-//		
+//
 //		//绘制光源
 //		myShader1_L.Use();
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1_L.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1_L.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
+//		myShader1_L.SetVec3f("lightColor", g_lightColor);
 //		glBindVertexArray(VAO_L);
 //		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 //		glBindVertexArray(0);//解绑

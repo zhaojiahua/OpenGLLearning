@@ -148,6 +148,12 @@
     <ClCompile Include="openGLLearning08_Camera.cpp" />
     <ClCompile Include="openGLLearning09_CameraClass.cpp" />
     <ClCompile Include="openGLLearning10_LightColor.cpp" />
+    <ClCompile Include="openGLLearning11_Material.cpp" />
+    <ClCompile Include="openGLLearning13_CastLight.cpp" />
+    <ClCompile Include="openGLLearning12_LightTexture.cpp" />
+    <ClCompile Include="openGLLearning14_PointLight.cpp" />
+    <ClCompile Include="openGLLearning16_MultiLights.cpp" />
+    <ClCompile Include="openGLLearning15_SpotLight.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
   </ItemGroup>

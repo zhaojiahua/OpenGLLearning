@@ -21,8 +21,9 @@
 //ZCamera zcamera(45.0f, static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 500.0f);
 //
 ////设置光源的位置和颜色
-//float g_lightColor[3] = { 1.0f,0.9f,0.7f };
+//glm::vec3 g_lightColor = { 1.0f,0.9f,0.1f };
 //glm::vec3 g_lightPos = { 1.2f,1.0f,2.0f };
+//glm::vec3 g_lightDirection = { -0.2f,-1.0f,-0.3f };
 //
 ////设置鼠标初始位置(鼠标的起始位置设置带屏幕的中心)
 //float lastX = screenWidth / 2, lastY = screenHeight / 2;
@@ -123,9 +124,9 @@
 //	glfwSetFramebufferSizeCallback(window, Framebuffer_size_callback);	//注册这个函数,告诉GLFW每当窗口发小调整的时候调用这个函数(窗口第一次显示的时候这个函数也会被调用)
 //	glfwSetCursorPosCallback(window, Mouse_move_callback);//告诉GLFW当鼠标移动的时候调用这个函数
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
-//	
-//	//自定义一个顶点数组
-//	float vertices[] = {//一个box数据 pos	normal		uv
+//
+//	//一个box模型
+//	float vertices[] = {
 //	-0.5f,-0.5f,0.5f , 0.0f,0.0f,1.0f , 0.0f,0.0f,
 //	0.5f,-0.5f,0.5f , 0.0f,0.0f,1.0f , 1.0f,0.0f,
 //	0.5f,0.5f,0.5f , 0.0f,0.0f,1.0f ,  1.0f,1.0f,
@@ -153,25 +154,26 @@
 //	};
 //	//顶点索引缓冲
 //	unsigned int indices[] = { 0,3,1,3,2,1,4,7,5,7,6,5,9,11,15,11,13,15,14,12,8,12,10,8,19,18,16,18,17,16,23,22,20,22,21,20 };
-//
-//	//自定义一个顶点数组用于光源
-//	float vertices_light[] = { -0.5f, -0.5f,   0.5f,		0.5f,  -0.5f,   0.5f,		-0.5f,  0.5f,   0.5f,		  0.5f,  0.5f,   0.5f,		-0.5f,   0.5f, -0.5f,		  0.5f,   0.5f, -0.5f,		 -0.5f, -0.5f, -0.5f,		0.5f,   -0.5f,   -0.5f };
-//	//光源的顶点索引缓冲
-//	unsigned int indices_light[] = { 0,2,1,2,3,1,2,4,3,4,5,3,4,6,5,6,7,5,6,0,7,0,1,7,1,3,7,3,5,7,6,4,0,4,2,0 };
+//	glm::vec3 cubePositions[10] = {
+//				glm::vec3(0.5f,  0.0f,  0.0f),
+//				glm::vec3(2.0f,  5.0f, -15.0f),
+//				glm::vec3(-1.5f, -2.2f, -2.5f),
+//				glm::vec3(-3.8f, -2.0f, -12.3f),
+//				glm::vec3(2.4f, -0.4f, -3.5f),
+//				glm::vec3(-1.7f,  3.0f, -7.5f),
+//				glm::vec3(1.3f, -2.0f, -2.5f),
+//				glm::vec3(1.5f,  2.0f, -2.5f),
+//				glm::vec3(1.5f,  0.2f, -1.5f),
+//				glm::vec3(-1.3f,  1.0f, -1.5f)
+//	};
 //
 //	//创建一个顶点缓冲对象和顶点数组对象和一个元素缓冲对象(为光源创建单独的VBO和VAO)
 //	unsigned int EBO;
-//	unsigned int EBO_L;
 //	unsigned int VBO;
-//	unsigned int VBO_L;
 //	unsigned int VAO;
-//	unsigned int VAO_L;
 //	glGenBuffers(1, &EBO);
-//	glGenBuffers(1, &EBO_L);
 //	glGenBuffers(1, &VBO);
-//	glGenBuffers(1, &VBO_L);
 //	glGenVertexArrays(1, &VAO);
-//	glGenVertexArrays(1, &VAO_L);
 //
 //	//绑定第一个VAO和VBO
 //	//绑定VAO
@@ -194,30 +196,17 @@
 //	glBindBuffer(GL_ARRAY_BUFFER, 0);
 //	glBindVertexArray(0);
 //
-//	//绑定光源的VAO_L和VBO_L
-//	glBindVertexArray(VAO_L);
-//	glBindBuffer(GL_ARRAY_BUFFER, VBO_L);
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_L);
-//	//填充数据
-//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_light), indices_light, GL_STATIC_DRAW);
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_light), vertices_light, GL_STATIC_DRAW);
-//	//设置顶点属性指针
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-//	glEnableVertexAttribArray(0);
-//	//解绑
-//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glBindVertexArray(0);
-//
 //	//创建顶点着色器
-//	Shader myShader1("shaders/openGLLearning10/vertexShader.vs", "shaders/openGLLearning10/fragmentShader1.fs");
-//	Shader myShader1_L("shaders/openGLLearning10/vertexShader_forlight.vs", "shaders/openGLLearning10/fragmentShader1_forlight.fs");
-//
+//	Shader myShader1("shaders/openGLLearning13/vertexShader.vs.c", "shaders/openGLLearning13/fragmentShader1.fs.c");
+//	
 //	//纹理
 //	//生成2个纹理对象
-//	unsigned int textures[2];
-//	glGenTextures(1, &textures[0]);
-//	//绑定纹理1
-//	glBindTexture(GL_TEXTURE_2D, textures[0]);
+//	unsigned int textures_diffuse, textures_specular;
+//	glGenTextures(1, &textures_diffuse);
+//	glGenTextures(1, &textures_specular);
+//
+//	//绑定漫反射纹理
+//	glBindTexture(GL_TEXTURE_2D, textures_diffuse);
 //	//设置当前绑定的纹理对象的环绕和过滤方式
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -225,49 +214,45 @@
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 //	//读取纹理图片
 //	int tex_width, tex_height, tex_channelsNum;
-//	unsigned char* tex_data = stbi_load("assets/textures/mx.jpg", &tex_width, &tex_height, &tex_channelsNum, 0);
-//	//使用glTexImage2D函数将图片数据生成纹理
-//	if (tex_data) {
-//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
-//		glGenerateMipmap(GL_TEXTURE_2D);	//这会为当前绑定的纹理自动生成所需要的多级渐进纹理
-//	}
-//	else cout << "Failed to load texture1" << endl;
-//
-//	//绑定纹理2
-//	stbi_set_flip_vertically_on_load(true);//加载图片的时候翻转Y坐标
-//	tex_data = stbi_load("assets/textures/face.png", &tex_width, &tex_height, &tex_channelsNum, 0);
-//	glGenTextures(1, &textures[1]);
-//	glBindTexture(GL_TEXTURE_2D, textures[1]);
-//	//设置当前绑定的纹理对象的环绕和过滤方式
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	unsigned char* tex_data = stbi_load("assets/textures/mx_diffuse.png", &tex_width, &tex_height, &tex_channelsNum, 0);
 //	//使用glTexImage2D函数将图片数据生成纹理
 //	if (tex_data) {
 //		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
 //		glGenerateMipmap(GL_TEXTURE_2D);	//这会为当前绑定的纹理自动生成所需要的多级渐进纹理
 //	}
-//	else cout << "Failed to load texture2" << endl;
+//	else cout << "Failed to load texture1" << endl;
+//
+//	//绑定高光反射纹理
+//	glBindTexture(GL_TEXTURE_2D, textures_specular);
+//	//设置当前绑定的纹理对象的环绕和过滤方式
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	//读取纹理图片
+//	tex_data = stbi_load("assets/textures/mx_specular.png", &tex_width, &tex_height, &tex_channelsNum, 0);
+//	//使用glTexImage2D函数将图片数据生成纹理
+//	if (tex_data) {
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+//		glGenerateMipmap(GL_TEXTURE_2D);	//这会为当前绑定的纹理自动生成所需要的多级渐进纹理
+//	}
+//	else cout << "Failed to load texture1" << endl;
 //	stbi_image_free(tex_data);	//生成纹理后释放data内存
 //
-//	//设置每个采样器对应的纹理单元
+//	//设置采样器对应的纹理单元
 //	myShader1.Use();
-//	myShader1.SetInt("myTexture1", 0);
-//	myShader1.SetInt("myTexture2", 1);
-//	myShader1.SetVec3f("lightColor", g_lightColor);
-//	myShader1.SetVec3f("lightPos", g_lightPos);
+//	myShader1.SetInt("material.diffuse", 0);
+//	myShader1.SetInt("material.specular", 1);
+//	myShader1.SetVec3f("light.direction", g_lightDirection);
+//	myShader1.SetVec3f("light.ambient", g_lightColor * 0.1f);
+//	myShader1.SetVec3f("light.diffuse", g_lightColor * 0.5f);
+//	myShader1.SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+//	myShader1.SetVec3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31));
+//	myShader1.SetVec3f("material.specular", glm::vec3(0.6f, 0.5f, 0.4));
+//	myShader1.SetFloat("material.shininess", 64.0f);
+//
 //	glm::mat4 modelM = glm::mat4(1.0f);
-//	modelM = glm::rotate(modelM, (float)glm::radians(10.0f), glm::vec3(1.0f, 0.5f, 0.0f));
 //	glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(modelM));
-//
-//	glm::mat4 modelM_L = glm::mat4(1.0f);
-//	modelM_L = glm::translate(modelM_L, g_lightPos);
-//	modelM_L = glm::scale(modelM_L, glm::vec3(0.2f));
-//	myShader1_L.Use();
-//	glUniformMatrix4fv(glGetUniformLocation(myShader1_L.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(modelM_L));
-//	myShader1_L.SetVec4f("lightColor", g_lightColor);
-//
 //	//开启深度测试
 //	glEnable(GL_DEPTH_TEST);
 //
@@ -288,23 +273,21 @@
 //		//激活这个程序对象
 //		myShader1.Use();
 //		glActiveTexture(GL_TEXTURE0);//激活第0号采样器(默认被激活)
-//		glBindTexture(GL_TEXTURE_2D, textures[0]);//绑定第一个texture到第0号采样器
+//		glBindTexture(GL_TEXTURE_2D, textures_diffuse);//绑定第一个textures_diffuse到第0号采样器
 //		glActiveTexture(GL_TEXTURE1);//激活第1号采样器
-//		glBindTexture(GL_TEXTURE_2D, textures[1]);	//绑定第二个texture到第1号采样器
+//		glBindTexture(GL_TEXTURE_2D, textures_specular);//绑定第一个textures_specular到第1号采样器
 //		glBindVertexArray(VAO);//每次绘制都绑定一次VAO
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
-//		//绘制被照射的箱子
-//		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-//		glBindVertexArray(0);//解绑
-//		
-//		//绘制光源
-//		myShader1_L.Use();
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1_L.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1_L.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
-//		glBindVertexArray(VAO_L);
-//		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+//		//绘制被照射的箱子10个
+//		for (unsigned int i = 0; i < 10; i++) {
+//			glm::mat4 tempModel = glm::mat4(1.0f);
+//			tempModel = glm::translate(tempModel, cubePositions[i]);
+//			tempModel = glm::rotate(tempModel, (float)glm::radians(i * 20.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+//			glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "m_matrix"), 1, GL_FALSE, glm::value_ptr(tempModel));
+//			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+//		}
 //		glBindVertexArray(0);//解绑
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上

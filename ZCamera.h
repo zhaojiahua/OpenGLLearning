@@ -44,5 +44,9 @@ public:
 	void MoveLeft();
 	//相机向右移动
 	void MoveRight();
+	//相机向上移动
+	void MoveUpWard();
+	//相机向下移动
+	void MoveDownWard();
 };
 

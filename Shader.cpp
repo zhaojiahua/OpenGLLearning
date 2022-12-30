@@ -86,9 +86,23 @@ void Shader::SetBool(const std::string& inname, bool invalue) const
 	glUniform1i(glGetUniformLocation(ID, inname.c_str()), (int)invalue);
 }
 
+bool Shader::GetBool(const std::string& inname) const
+{
+	int tempvalue;
+	glGetUniformiv(ID, glGetUniformLocation(ID, inname.c_str()), &tempvalue);
+	return tempvalue;
+}
+
 void Shader::SetInt(const std::string& inname, int invalue) const
 {
 	glUniform1i(glGetUniformLocation(ID, inname.c_str()), invalue);
+}
+
+int Shader::GetInt(const std::string& inname) const
+{
+	int tempvalue;
+	glGetUniformiv(ID, glGetUniformLocation(ID, inname.c_str()), &tempvalue);
+	return tempvalue;
 }
 
 void Shader::SetFloat(const std::string& inname, float invalue) const
@@ -96,12 +110,29 @@ void Shader::SetFloat(const std::string& inname, float invalue) const
 	glUniform1f(glGetUniformLocation(ID, inname.c_str()), invalue);
 }
 
+float Shader::GetFloat(const std::string& inname) const
+{
+	float tempvalue;
+	glGetUniformfv(ID, glGetUniformLocation(ID, inname.c_str()), &tempvalue);
+	return tempvalue;
+}
+
 void Shader::SetVec3f(const std::string& inname, float invalue[3]) const
 {
 	glUniform3f(glGetUniformLocation(ID, inname.c_str()), invalue[0], invalue[1], invalue[2]);
 }
 
+void Shader::SetVec3f(const std::string& inname, glm::vec3 invalue) const
+{
+	glUniform3f(glGetUniformLocation(ID, inname.c_str()), invalue[0], invalue[1], invalue[2]);
+}
+
 void Shader::SetVec4f(const std::string& inname, float invalue[4]) const
+{
+	glUniform4f(glGetUniformLocation(ID, inname.c_str()), invalue[0], invalue[1], invalue[2], invalue[3]);
+}
+
+void Shader::SetVec4f(const std::string& inname, glm::vec4 invalue) const
 {
 	glUniform4f(glGetUniformLocation(ID, inname.c_str()), invalue[0], invalue[1], invalue[2], invalue[3]);
 }

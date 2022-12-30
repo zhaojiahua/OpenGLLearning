@@ -54,6 +54,24 @@
     <ClCompile Include="openGLLearning10_LightColor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="openGLLearning11_Material.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning12_LightTexture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning13_CastLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning14_PointLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning15_SpotLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning16_MultiLights.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

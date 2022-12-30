@@ -1,6 +1,10 @@
 #pragma once
 #include <glad/glad.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -21,8 +25,13 @@ public:
 
 	//uniform工具函数
 	void SetBool(const std::string& inname, bool invalue) const;
+	bool GetBool(const std::string& inname) const;
 	void SetInt(const std::string& inname, int invalue) const;
+	int GetInt(const std::string& inname) const;
 	void SetFloat(const std::string& inname, float invalue) const;
+	float GetFloat(const std::string& inname) const;
 	void SetVec3f(const std::string& inname, float invalue[3]) const;
+	void SetVec3f(const std::string& inname, glm::vec3 invalue) const;
 	void SetVec4f(const std::string& inname, float invalue[4]) const;
+	void SetVec4f(const std::string& inname, glm::vec4 invalue) const;
 };
