@@ -115,7 +115,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Solution)Dependencys\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,7 +133,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(Solution)Dependencys\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -154,13 +154,27 @@
     <ClCompile Include="openGLLearning14_PointLight.cpp" />
     <ClCompile Include="openGLLearning16_MultiLights.cpp" />
     <ClCompile Include="openGLLearning15_SpotLight.cpp" />
+    <ClCompile Include="openGLLearning17_MeshModel.cpp" />
+    <ClCompile Include="openGLLearning18_MeshModel_bug.cpp" />
+    <ClCompile Include="openGLLearning19_DepthTesting.cpp" />
+    <ClCompile Include="openGLLearning20_Stencil Testing.cpp" />
+    <ClCompile Include="openGLLearning21_Blending.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
+    <ClCompile Include="ZDirectionLight.cpp" />
+    <ClCompile Include="ZMesh.cpp" />
+    <ClCompile Include="ZPointLight.cpp" />
+    <ClCompile Include="ZSpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="ZCamera.h" />
+    <ClInclude Include="ZDirectionLight.h" />
+    <ClInclude Include="ZLight.h" />
+    <ClInclude Include="ZMesh.h" />
+    <ClInclude Include="ZPointLight.h" />
+    <ClInclude Include="ZSpotLight.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

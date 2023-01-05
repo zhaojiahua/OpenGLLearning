@@ -137,4 +137,15 @@ void Shader::SetVec4f(const std::string& inname, glm::vec4 invalue) const
 	glUniform4f(glGetUniformLocation(ID, inname.c_str()), invalue[0], invalue[1], invalue[2], invalue[3]);
 }
 
+void Shader::SetMat4f(const std::string& inname, glm::mat4 invalue) const
+{
+	float tempM[16] = {
+		invalue[0].x,invalue[0].y,invalue[0].z,invalue[0].w,
+		invalue[1].x,invalue[1].y,invalue[1].z,invalue[1].w,
+		invalue[2].x,invalue[2].y,invalue[2].z,invalue[2].w,
+		invalue[3].x,invalue[3].y,invalue[3].z,invalue[3].w
+	};
+	glUniformMatrix4fv(glGetUniformLocation(ID, inname.c_str()), 1, GL_TRUE, tempM);
+}
+
 

@@ -17,6 +17,8 @@ public:
 	//着色器程序ID
 	unsigned int ID;
 
+	int test = 1;
+
 	//构造shader类的时候读取shader代码并构建着色器
 	Shader(const char* vertexShaderPath, const char* fragmentShaderPath);
 
@@ -34,4 +36,6 @@ public:
 	void SetVec3f(const std::string& inname, glm::vec3 invalue) const;
 	void SetVec4f(const std::string& inname, float invalue[4]) const;
 	void SetVec4f(const std::string& inname, glm::vec4 invalue) const;
+	void SetMat4f(const std::string& inname, glm::mat4 invalue) const;
+
 };

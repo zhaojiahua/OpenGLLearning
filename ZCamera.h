@@ -18,7 +18,7 @@ public:
 	float yaw = 0.0f;
 	float pitch = 0.0f;
 
-	float cameraMoveSpeed = 0.0005f;
+	float cameraMoveSpeed = 0.005f;
 	float sensitivity = 0.02f;	//鼠标灵敏度
 	float fov = 45.0f;//初始相机视角为45度
 	float ratio = 4.0f / 3.0f;

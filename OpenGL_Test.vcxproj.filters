@@ -72,6 +72,33 @@
     <ClCompile Include="openGLLearning16_MultiLights.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ZDirectionLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZPointLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZSpotLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning17_MeshModel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZMesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning18_MeshModel_bug.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning19_DepthTesting.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning20_Stencil Testing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning21_Blending.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -81,6 +108,21 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ZCamera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZLight.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZDirectionLight.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZPointLight.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZSpotLight.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZMesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
