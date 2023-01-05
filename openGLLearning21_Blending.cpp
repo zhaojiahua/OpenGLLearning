@@ -128,7 +128,6 @@ int main()
 		cout << "Failed to initialize GLAD" << endl;
 		return -1;
 	}
-
 	//视口
 	//在我们开始渲染之前还有一件重要的事情要做的就是设置渲染窗口的大小,即视口的大小(viewport),这样OpenGL知道怎么根据窗口的大小显示数据和坐标(通常我们设置视口比窗口小一点,这样可以在视口外窗口内显示一些其他的可视元素)
 	glViewport(0, 0, screenWidth, screenHeight);	//前两个参数是视口左下角的位置,后两个参数是视口的宽和高
@@ -171,7 +170,7 @@ int main()
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		zcamera.cameraMoveSpeed = 2.50f * deltaTime;
+		zcamera.cameraMoveSpeed = 5.0f * deltaTime;
 
 		//渲染指令
 		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
