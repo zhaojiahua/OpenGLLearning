@@ -159,6 +159,10 @@
     <ClCompile Include="openGLLearning19_DepthTesting.cpp" />
     <ClCompile Include="openGLLearning20_Stencil Testing.cpp" />
     <ClCompile Include="openGLLearning21_Blending.cpp" />
+    <ClCompile Include="openGLLearning22_FrameBuffer.cpp" />
+    <ClCompile Include="openGLLearning23_BoxMap.cpp" />
+    <ClCompile Include="openGLLearning25_advancedGLSL.cpp" />
+    <ClCompile Include="openGLLearning24_Reflect.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
     <ClCompile Include="ZDirectionLight.cpp" />

@@ -44,7 +44,7 @@ ZMesh::ZMesh(vector<ZVertex> vertices, vector<unsigned int> indices, vector<ZTex
 	SetupMesh();
 }
 
-void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix)
+void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix,unsigned int DrawMode)
 {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
@@ -72,7 +72,7 @@ void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix)
 	
 	//绘制网格
 	glBindVertexArray(mVAO);
-	glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(DrawMode, mIndices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
 }
@@ -119,7 +119,7 @@ ZModel::ZModel(const char* path)
 	LoadModel(path);
 }
 
-void ZModel::Draw(Shader* inshader, glm::mat4 inMMatrix,glm::vec3 cameraPosition)
+void ZModel::Draw(Shader* inshader, glm::mat4 inMMatrix,glm::vec3 cameraPosition,unsigned int DrawMode)
 {
 	//给物体按距离排序,渲染的时候由远及近以此绘制
 	map<float, ZMesh>sorted;
@@ -130,7 +130,7 @@ void ZModel::Draw(Shader* inshader, glm::mat4 inMMatrix,glm::vec3 cameraPosition
 	}
 	//逆序绘制每一个mesh
 	for (map<float, ZMesh>::reverse_iterator rit = sorted.rbegin(); rit != sorted.rend(); rit++) {
-		rit->second.Draw(inshader, inMMatrix);
+		rit->second.Draw(inshader, inMMatrix, DrawMode);
 	}
 	//for (auto mesh : meshes) {
 	//	mesh.Draw(inshader, inMMatrix);

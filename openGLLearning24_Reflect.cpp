@@ -34,9 +34,9 @@
 //};
 //
 ////配置平行光源(红色调)
-//ZDirectionLight directionLight(glm::vec4(1.0f, 0.3f, 0.2f,1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+//ZDirectionLight directionLight(glm::vec4(1.0f, 0.3f, 0.2f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
 ////配置聚光灯(绿色调)
-//ZSpotLight spotLight(glm::vec4(0.2f, 1.0f, 0.1f,1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
+//ZSpotLight spotLight(glm::vec4(0.2f, 1.0f, 0.1f, 1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 //
 ////设置鼠标初始位置(鼠标的起始位置设置带屏幕的中心)
 //float lastX = screenWidth / 2, lastY = screenHeight / 2;
@@ -103,6 +103,28 @@
 //	}
 //}
 //
+////加载天空盒子
+//unsigned int LoadCubeMap(vector<string> textures_faces) {
+//	unsigned int texture_box;
+//	glGenTextures(1, &texture_box);
+//	glBindTexture(GL_TEXTURE_CUBE_MAP, texture_box);
+//	//遍历纹理目标
+//	int texC_width, texC_height, texC_nrChannels;
+//	for (unsigned int i = 0; i < textures_faces.size(); i++) {
+//		unsigned char* tempdata = stbi_load(textures_faces[i].c_str(), &texC_width, &texC_height, &texC_nrChannels, 0);
+//		if (tempdata) {
+//			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, texC_width, texC_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tempdata);
+//		}
+//		else cout << "Cubemap texture failed to load at path:" << textures_faces[i] << endl;
+//		stbi_image_free(tempdata);
+//	}
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//	return texture_box;
+//}
 //
 //int main()
 //{
@@ -139,14 +161,82 @@
 //
 //	//加载模型数据
 //	//ZModel testModel("assets/models/nanosuit/nanosuit.obj");
-//	//ZModel testModel2("./assets/models/box.obj");
+//	//ZModel testModel("assets/models/box.obj");
 //	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
 //	ZModel testModel("assets/models/boxes/boxes.fbx");
-//	ZModel testModel_Ground("assets/models/ground/ground.obj");
+//	//ZModel testModel_Ground("assets/models/ground/ground.obj");
 //	//testModel.meshes[3].PrintMM();
-//	//创建顶点着色器
-//	Shader myShader1("shaders/openGLLearning21/vertexShader.vs.c", "shaders/openGLLearning21/fragmentShader1.fs.c");
-//	Shader myShader1_Single("shaders/openGLLearning20/vertexShader.vs.c", "shaders/openGLLearning20/fragmentShader1_singleColor.fs.c");
+//
+//	//天空盒模型数据
+//	float skyboxVertices[] = {
+//		-1.0f,  1.0f, -1.0f,
+//		-1.0f, -1.0f, -1.0f,
+//		 1.0f, -1.0f, -1.0f,
+//		 1.0f, -1.0f, -1.0f,
+//		 1.0f,  1.0f, -1.0f,
+//		-1.0f,  1.0f, -1.0f,
+//
+//		-1.0f, -1.0f,  1.0f,
+//		-1.0f, -1.0f, -1.0f,
+//		-1.0f,  1.0f, -1.0f,
+//		-1.0f,  1.0f, -1.0f,
+//		-1.0f,  1.0f,  1.0f,
+//		-1.0f, -1.0f,  1.0f,
+//
+//		 1.0f, -1.0f, -1.0f,
+//		 1.0f, -1.0f,  1.0f,
+//		 1.0f,  1.0f,  1.0f,
+//		 1.0f,  1.0f,  1.0f,
+//		 1.0f,  1.0f, -1.0f,
+//		 1.0f, -1.0f, -1.0f,
+//
+//		-1.0f, -1.0f,  1.0f,
+//		-1.0f,  1.0f,  1.0f,
+//		 1.0f,  1.0f,  1.0f,
+//		 1.0f,  1.0f,  1.0f,
+//		 1.0f, -1.0f,  1.0f,
+//		-1.0f, -1.0f,  1.0f,
+//
+//		-1.0f,  1.0f, -1.0f,
+//		 1.0f,  1.0f, -1.0f,
+//		 1.0f,  1.0f,  1.0f,
+//		 1.0f,  1.0f,  1.0f,
+//		-1.0f,  1.0f,  1.0f,
+//		-1.0f,  1.0f, -1.0f,
+//
+//		-1.0f, -1.0f, -1.0f,
+//		-1.0f, -1.0f,  1.0f,
+//		 1.0f, -1.0f, -1.0f,
+//		 1.0f, -1.0f, -1.0f,
+//		-1.0f, -1.0f,  1.0f,
+//		 1.0f, -1.0f,  1.0f
+//	};
+//	unsigned int boxVAO, boxVBO;
+//	glGenBuffers(1, &boxVBO);
+//	glGenVertexArrays(1, &boxVAO);
+//	glBindVertexArray(boxVAO);
+//	glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+//	glEnableVertexAttribArray(0);
+//	glBindVertexArray(0);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//
+//	//创建立方体贴图
+//	vector<string>faces{//贴图路径
+//		"assets/textures/skybox/right.jpg",
+//		"assets/textures/skybox/left.jpg",
+//		"assets/textures/skybox/top.jpg",
+//		"assets/textures/skybox/bottom.jpg",
+//		"assets/textures/skybox/front.jpg",
+//		"assets/textures/skybox/back.jpg",
+//	};
+//	unsigned int cubemap = LoadCubeMap(faces);
+//
+//
+//	//创建着色器
+//	Shader myShader1("shaders/openGLLearning24/vertexShader.vs.c", "shaders/openGLLearning24/fragmentShader1_refract.fs.c");
+//	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");
 //
 //	//设置采样器对应的纹理单元
 //	myShader1.Use();
@@ -156,13 +246,8 @@
 //	//配置聚光灯
 //	spotLight.SetLight(&myShader1, 0, 0.1f, 0.3f, glm::vec4(1.0f));
 //
-//
-//	//开启深度测试
-//	glEnable(GL_DEPTH_TEST);
-//	//开启混合模式
-//	glEnable(GL_BLEND);
-//	//设定混合函数
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	myShader1_skybox.Use();
+//	myShader1_skybox.SetInt("cubemap", 0);
 //
 //	//保持渲染循环
 //	while (!glfwWindowShouldClose(window)) {	//如果检测到GLFW要求被关闭就结束循环
@@ -170,12 +255,28 @@
 //		float currentFrame = glfwGetTime();
 //		deltaTime = currentFrame - lastFrame;
 //		lastFrame = currentFrame;
-//		zcamera.cameraMoveSpeed = 5.0f * deltaTime;
+//		zcamera.cameraMoveSpeed = 10.0f * deltaTime;
 //
 //		//渲染指令
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除颜色缓冲和深度缓冲
-//
+//		//开启深度测试
+//		glEnable(GL_DEPTH_TEST);
+//		//开启混合模式
+//		glEnable(GL_BLEND);
+//		//设定混合函数
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//		//第一个渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
+//		glDepthFunc(GL_LEQUAL);
+//		myShader1_skybox.Use();
+//		glm::mat4 viewM = glm::mat4(glm::mat3(zcamera.GetCameraViewMatrix()));//去除相机的位移信息,只保留相机的旋转信息
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1_skybox.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(viewM));
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1_skybox.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
+//		glBindVertexArray(boxVAO);
+//		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
+//		glDrawArrays(GL_TRIANGLES, 0, 36);
+//		glDepthFunc(GL_LESS);
+//		//然后绘制其他场景
 //		//激活这个程序对象
 //		myShader1.Use();
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
@@ -186,13 +287,15 @@
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
 //		glm::mat4 tempModel = glm::mat4(1.0f);
 //		tempModel = glm::scale(tempModel, glm::vec3(0.8f));
-//
-//		testModel_Ground.Draw(&myShader1, tempModel, zcamera.cameraPos);
+//		//testModel_Ground.Draw(&myShader1, tempModel, zcamera.cameraPos);
 //		testModel.Draw(&myShader1, tempModel, zcamera.cameraPos);
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数
 //	}
+//	//释放缓冲内存
+//	glDeleteVertexArrays(1, &boxVAO);
+//	glDeleteBuffers(1, &boxVBO);
 //
 //	glfwTerminate();	//渲染结束后我们需要释放所有的分配资源,此函数可以完成
 //	return 0;

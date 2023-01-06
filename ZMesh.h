@@ -42,7 +42,7 @@ public:
 	ZMesh();
 	ZMesh(vector<ZVertex> vertices, vector<unsigned int>indices, vector<ZTexture>textures);
 	//绘制函数
-	void Draw(Shader* inshader, glm::mat4 inMMatrix);
+	void Draw(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode);
 	//打印矩阵(用语调试)
 	void PrintMM();
 
@@ -56,7 +56,7 @@ class ZModel
 {
 public:
 	ZModel(const char* path);
-	void Draw(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition);
+	void Draw(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition,unsigned int DrawMode);
 
 	vector<ZTexture> textures_loaded;
 	//模型数据

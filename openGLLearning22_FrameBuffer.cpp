@@ -34,9 +34,9 @@
 //};
 //
 ////配置平行光源(红色调)
-//ZDirectionLight directionLight(glm::vec4(1.0f, 0.3f, 0.2f,1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+//ZDirectionLight directionLight(glm::vec4(1.0f, 0.3f, 0.2f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
 ////配置聚光灯(绿色调)
-//ZSpotLight spotLight(glm::vec4(0.2f, 1.0f, 0.1f,1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
+//ZSpotLight spotLight(glm::vec4(0.2f, 1.0f, 0.1f, 1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 //
 ////设置鼠标初始位置(鼠标的起始位置设置带屏幕的中心)
 //float lastX = screenWidth / 2, lastY = screenHeight / 2;
@@ -137,16 +137,80 @@
 //	glfwSetCursorPosCallback(window, Mouse_move_callback);//告诉GLFW当鼠标移动的时候调用这个函数
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
 //
+//
+//	//创建一个帧缓冲对象
+//	unsigned int fbo;
+//	glGenFramebuffers(1, &fbo);
+//	//绑定到激活对象,做一些操作,然后解绑
+//	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+//
+//	//给帧缓冲创建一个附加纹理
+//	unsigned int bufferTexture;
+//	glGenTextures(1, &bufferTexture);
+//	glBindTexture(GL_TEXTURE_2D, bufferTexture);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glBindTexture(GL_TEXTURE_2D, 0);
+//	//将纹理附加到帧缓冲对象上
+//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTexture, 0);
+//
+//	//为帧缓冲创建一个渲染缓冲对象
+//	unsigned int rbo;
+//	glGenRenderbuffers(1, &rbo);
+//	//绑定渲染缓冲对象,对当前渲染缓冲对象操作
+//	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+//	//为这个渲染缓冲对象创建一个深度和模版缓冲对象
+//	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+//	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+//	//附加这个渲染缓冲对象到帧缓冲的深度和模版附件上
+//	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+//
+//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {//检查帧缓冲是否完整
+//		cout << "error:Framebuffer::Framebuffer is not complete!" << endl;
+//	}
+//	//离屏渲染需要将这个帧缓冲绑定到默认激活帧缓冲
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//
+//	//创建一个四边形当作屏幕,将离屏渲染的帧缓冲当作这个四边形的纹理
+//	float rect[] = {
+//		-1.0f,-1.0f,0.0f,		0.0f,0.0f,
+//		1.0f,	-1.0f,0.0f,		1.0f,0.0f,
+//		1.0f,	 1.0f, 0.0f,		1.0f,1.0f,
+//		-1.0f, 1.0f, 0.0f,		0.0f,1.0f
+//	};
+//	unsigned int rectIndices[] = {0,1,3,	1,2,3};
+//
+//	unsigned int recVAO, recVBO, recEBO;
+//	glGenBuffers(1, &recVBO);
+//	glGenBuffers(1, &recEBO);
+//	glGenVertexArrays(1, &recVAO);
+//	glBindVertexArray(recVAO);
+//	glBindBuffer(GL_ARRAY_BUFFER,recVBO);
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,recEBO);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectIndices), rectIndices, GL_STATIC_DRAW);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+//	glEnableVertexAttribArray(0);
+//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+//	glEnableVertexAttribArray(1);
+//	glBindVertexArray(0);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//
 //	//加载模型数据
 //	//ZModel testModel("assets/models/nanosuit/nanosuit.obj");
-//	//ZModel testModel2("./assets/models/box.obj");
-//	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
-//	ZModel testModel("assets/models/boxes/boxes.fbx");
-//	ZModel testModel_Ground("assets/models/ground/ground.obj");
+//	//ZModel testModel("assets/models/box.obj");
+//	ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
+//	//ZModel testModel("assets/models/boxes/boxes.fbx");
+//	//ZModel testModel_Ground("assets/models/ground/ground.obj");
 //	//testModel.meshes[3].PrintMM();
-//	//创建顶点着色器
+//	
+//	//创建着色器
 //	Shader myShader1("shaders/openGLLearning21/vertexShader.vs.c", "shaders/openGLLearning21/fragmentShader1.fs.c");
-//	Shader myShader1_Single("shaders/openGLLearning20/vertexShader.vs.c", "shaders/openGLLearning20/fragmentShader1_singleColor.fs.c");
+//	Shader myShader1_rect("shaders/openGLLearning22/vertexShader.vs.c", "shaders/openGLLearning22/fragmentShader1.fs.c");
+//	Shader myShader1_rect_inversion("shaders/openGLLearning22/vertexShader.vs.c", "shaders/openGLLearning22/fragmentShader1_inversion.fs.c");
+//	Shader myShader1_rect_grayscale("shaders/openGLLearning22/vertexShader.vs.c", "shaders/openGLLearning22/fragmentShader1_grayscale.fs.c");
+//	Shader myShader1_rect_kernel("shaders/openGLLearning22/vertexShader.vs.c", "shaders/openGLLearning22/fragmentShader1_kernel.fs.c");
 //
 //	//设置采样器对应的纹理单元
 //	myShader1.Use();
@@ -155,14 +219,6 @@
 //	directionLight.SetLight(&myShader1, 0, 0.1f, 0.5f, glm::vec4(1.0f));
 //	//配置聚光灯
 //	spotLight.SetLight(&myShader1, 0, 0.1f, 0.3f, glm::vec4(1.0f));
-//
-//
-//	//开启深度测试
-//	glEnable(GL_DEPTH_TEST);
-//	//开启混合模式
-//	glEnable(GL_BLEND);
-//	//设定混合函数
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //
 //	//保持渲染循环
 //	while (!glfwWindowShouldClose(window)) {	//如果检测到GLFW要求被关闭就结束循环
@@ -173,8 +229,16 @@
 //		zcamera.cameraMoveSpeed = 5.0f * deltaTime;
 //
 //		//渲染指令
+//		//第一阶段处理
+//		glBindFramebuffer(GL_FRAMEBUFFER, fbo);//绑定到自建的帧缓冲对象上
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除颜色缓冲和深度缓冲
+//		//开启深度测试
+//		glEnable(GL_DEPTH_TEST);
+//		//开启混合模式
+//		glEnable(GL_BLEND);
+//		//设定混合函数
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //
 //		//激活这个程序对象
 //		myShader1.Use();
@@ -186,9 +250,25 @@
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
 //		glm::mat4 tempModel = glm::mat4(1.0f);
 //		tempModel = glm::scale(tempModel, glm::vec3(0.8f));
-//
-//		testModel_Ground.Draw(&myShader1, tempModel, zcamera.cameraPos);
+//		//testModel_Ground.Draw(&myShader1, tempModel, zcamera.cameraPos);
 //		testModel.Draw(&myShader1, tempModel, zcamera.cameraPos);
+//
+//		//第二阶段处理
+//		glBindFramebuffer(GL_FRAMEBUFFER, 0);//返回默认的帧缓冲,开始渲染rect
+//		glClearColor(0.8f, 0.8f, 0.8f,1.0f);
+//		glClear(GL_COLOR_BUFFER_BIT);
+//		/*myShader1_rect.Use();
+//		myShader1_rect.SetInt("screenTex", 0);*/
+//		/*myShader1_rect_inversion.Use();
+//		myShader1_rect_inversion.SetInt("screenTex",0);*/
+//		/*myShader1_rect_grayscale.Use();
+//		myShader1_rect_grayscale.SetInt("screenTex", 0);*/
+//		myShader1_rect_kernel.Use();
+//		myShader1_rect_kernel.SetInt("screenTex", 0);
+//		glBindVertexArray(recVAO);
+//		glDisable(GL_DEPTH_TEST);
+//		glBindTexture(GL_TEXTURE_2D, bufferTexture);
+//		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数
