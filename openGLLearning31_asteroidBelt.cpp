@@ -148,12 +148,45 @@
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
 //
 //	//加载模型数据
-//	//ZModel testModel("assets/models/nanosuit/nanosuit.obj");
-//	//ZModel testModel("assets/models/box.obj");
+//	ZModel testModel("assets/models/nanosuit/nanosuit.fbx");
+//	//ZModel testModel("assets/models/box.fbx");
 //	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
-//	ZModel testModel("assets/models/boxes/boxes.fbx");
+//	//ZModel testModel("assets/models/boxes/boxes.fbx");
 //	//ZModel testModel_Ground("assets/models/ground/ground.obj");
-//	//testModel.meshes[3].PrintMM();
+//	//ZModel testModel("assets/models/skybox/box.fbx");
+//	ZModel testModel_planet("assets/models/planet/planet.obj");
+//	ZModel testModel_rock("assets/models/rock/rock.obj");
+//
+//	//1000个模型矩阵,生产1000个围绕行星的小碎石
+//	unsigned int amount = 10000;
+//	glm::mat4* modelMatrices = new glm::mat4[amount];
+//	srand(glfwGetTime());//初始化随机种子,用时间戳来初始化rand随机函数的种子才会产生真随机数,否则的话rand函数产生的是伪随机
+//	float radius = 30.0f;
+//	float offset = 10.5f;
+//	for (unsigned int i = 0; i < amount; i++) {
+//		glm::mat4 tempMM(1.0f);
+//		//移动(在360的方向上随机)
+//		float angle = (float)i / 1000.0f * 360.0f;
+//		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+//		float x = sin(angle) * radius + displacement;
+//		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+//		float y = 0.4f * displacement;
+//		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+//		float z = cos(angle) * radius + displacement;
+//		tempMM = glm::translate(tempMM, glm::vec3(x, y, z));
+//		//旋转(绕某个固定轴线旋转一个随机角度)
+//		float rotAngle = (rand() % 360);
+//		tempMM = glm::rotate(tempMM, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+//		//缩放(随机大小缩放值在0.05-0.25之间)
+//		float rscale = (rand() % 20) / 100.0f + 0.05f;
+//		tempMM = glm::scale(tempMM, glm::vec3(rscale));
+//		modelMatrices[i] = tempMM;
+//	}
+//
+//	//配置平行光源(红色调)
+//	ZDirectionLight directionLight(glm::vec4(1.0f, 0.85f, 0.8f,1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+//	//配置聚光灯(绿色调)
+//	ZSpotLight spotLight(glm::vec4(0.3f, 0.5f, 0.35f,1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 //
 //	//天空盒模型数据
 //	float skyboxVertices[] = {
@@ -221,10 +254,16 @@
 //	};
 //	unsigned int cubemap = LoadCubeMap(faces);
 //
-//
 //	//创建着色器
-//	Shader myShader1("shaders/openGLLearning25/vertexShader.vs.c", "shaders/openGLLearning25/fragmentShader1.fs.c");
+//	Shader myShader1("shaders/openGLLearning31/vertexShader.vs.c", "shaders/openGLLearning31/fragmentShader1.fs.c");
 //	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");
+//
+//	//设置采样器对应的纹理单元
+//	myShader1.Use();
+//	myShader1.SetFloat("material.shininess", 16.0f);
+//	//把灯光信息传递给shader
+//	directionLight.SetLight(&myShader1, 0, 0.1f, 0.5f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+//	spotLight.SetLight(&myShader1, 0, 0.1f, 0.6f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 //
 //	myShader1_skybox.Use();
 //	myShader1_skybox.SetInt("cubemap", 0);
@@ -240,7 +279,7 @@
 //		//渲染指令
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除颜色缓冲和深度缓冲
-//		
+//
 //		//第一个渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
 //		glDepthFunc(GL_LEQUAL);
 //		myShader1_skybox.Use();
@@ -252,16 +291,21 @@
 //		glDrawArrays(GL_TRIANGLES, 0, 36);
 //		glDepthFunc(GL_LESS);
 //		//然后绘制其他场景
+//		//开启深度测试
+//		glEnable(GL_DEPTH_TEST);
 //		//激活这个程序对象
 //		myShader1.Use();
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
-//		glm::mat4 tempModel = glm::mat4(1.0f);
-//		tempModel = glm::scale(tempModel, glm::vec3(0.8f));
-//		//渲染点的大小
-//		//glEnable(GL_PROGRAM_POINT_SIZE);
-//		testModel.Draw(&myShader1, tempModel, zcamera.cameraPos, GL_TRIANGLES);
+//		//以相机的位置和方向设置聚光灯
+//		myShader1.SetVec3f("spotlights[0].position", zcamera.cameraPos);
+//		myShader1.SetVec3f("spotlights[0].direction", zcamera.GetCameraFront());
+//		myShader1.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
+//		myShader1.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
+//		testModel_planet.Draw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
+//		//绘制小行星
+//		for (unsigned int i = 0; i < amount; i++) {
+//			testModel_rock.Draw(&myShader1, modelMatrices[i], zcamera.cameraPos, GL_TRIANGLES);
+//		}
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数

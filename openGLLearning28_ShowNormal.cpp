@@ -25,6 +25,10 @@
 //
 ////创建一个摄像机
 //ZCamera zcamera(45.0f, static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 500.0f);
+////配置平行光源(红色调)
+//ZDirectionLight directionLight(glm::vec4(1.0f, 0.3f, 0.2f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+////配置聚光灯(绿色调)
+//ZSpotLight spotLight(glm::vec4(0.2f, 1.0f, 0.1f, 1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 //
 ////设置鼠标初始位置(鼠标的起始位置设置带屏幕的中心)
 //float lastX = screenWidth / 2, lastY = screenHeight / 2;
@@ -148,10 +152,11 @@
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
 //
 //	//加载模型数据
-//	//ZModel testModel("assets/models/nanosuit/nanosuit.obj");
-//	//ZModel testModel("assets/models/box.obj");
-//	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
-//	ZModel testModel("assets/models/boxes/boxes.fbx");
+//	//ZModel testModel("assets/models/nanosuit/nanosuit.fbx");
+//	//ZModel testModel("assets/models/box.fbx");
+//	ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
+//	//ZModel testModel("assets/models/small-scene/smallscene.fbx");
+//	//ZModel testModel("assets/models/boxes/boxes.fbx");
 //	//ZModel testModel_Ground("assets/models/ground/ground.obj");
 //	//testModel.meshes[3].PrintMM();
 //
@@ -223,8 +228,24 @@
 //
 //
 //	//创建着色器
-//	Shader myShader1("shaders/openGLLearning25/vertexShader.vs.c", "shaders/openGLLearning25/fragmentShader1.fs.c");
+//	/*Shader myShader1;
+//	myShader1.GenVertexShader("shaders/openGLLearning25/vertexShader.vs.c");
+//	myShader1.GenGeometryShader("shaders/openGLLearning25/geometryShader.vs.c");
+//	myShader1.GenFragmentShader("shaders/openGLLearning25/fragmentShader1.fs.c");*/
+//	//Shader myShader1("shaders/openGLLearning25/vertexShader.vs.c", "shaders/openGLLearning25/fragmentShader1.fs.c");
+//	//Shader myShader1_geometry("shaders/openGLLearning26/vertexShader.vs.c", "shaders/openGLLearning26/fragmentShader1.fs.c");
+//	//Shader myShader1("shaders/openGLLearning26/vertexShader.vs.c", "shaders/openGLLearning26/fragmentShader1.fs.c");//不带几何着色器
+//	Shader myShader1("shaders/openGLLearning28/vertexShader.vs.c", "shaders/openGLLearning28/fragmentShader1.fs.c");
+//	Shader myShader1_normal("shaders/openGLLearning28/vertexShader_geo.vs.c", "shaders/openGLLearning28/fragmentShader1_geo.fs.c", "shaders/openGLLearning28/geometryShader.vs.c");//带几何着色器
 //	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");
+//
+//	//设置采样器对应的纹理单元
+//	myShader1.Use();
+//	myShader1.SetFloat("material.shininess", 64.0f);
+//	//配置平行光
+//	directionLight.SetLight(&myShader1, 0, 0.1f, 0.5f, glm::vec4(1.0f));
+//	//配置聚光灯
+//	spotLight.SetLight(&myShader1, 0, 0.1f, 0.3f, glm::vec4(1.0f));
 //
 //	myShader1_skybox.Use();
 //	myShader1_skybox.SetInt("cubemap", 0);
@@ -240,7 +261,7 @@
 //		//渲染指令
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除颜色缓冲和深度缓冲
-//		
+//
 //		//第一个渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
 //		glDepthFunc(GL_LEQUAL);
 //		myShader1_skybox.Use();
@@ -252,16 +273,26 @@
 //		glDrawArrays(GL_TRIANGLES, 0, 36);
 //		glDepthFunc(GL_LESS);
 //		//然后绘制其他场景
+//		//开启深度测试
+//		glEnable(GL_DEPTH_TEST);
+//		//开启混合模式
+//		glEnable(GL_BLEND);
+//		//设定混合函数
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //		//激活这个程序对象
 //		myShader1.Use();
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
+//		myShader1.SetVec3f("spotlights[0].position", zcamera.cameraPos);
+//		myShader1.SetVec3f("spotlights[0].direction", zcamera.GetCameraFront());
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
-//		glm::mat4 tempModel = glm::mat4(1.0f);
-//		tempModel = glm::scale(tempModel, glm::vec3(0.8f));
-//		//渲染点的大小
-//		//glEnable(GL_PROGRAM_POINT_SIZE);
-//		testModel.Draw(&myShader1, tempModel, zcamera.cameraPos, GL_TRIANGLES);
+//		testModel.Draw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
+//		//绘制法线
+//		myShader1_normal.Use();
+//		myShader1_normal.SetVec3f("viewPos", zcamera.cameraPos);
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1_normal.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1_normal.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
+//		testModel.Draw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数

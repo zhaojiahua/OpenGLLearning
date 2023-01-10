@@ -148,10 +148,11 @@
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
 //
 //	//加载模型数据
-//	//ZModel testModel("assets/models/nanosuit/nanosuit.obj");
-//	//ZModel testModel("assets/models/box.obj");
-//	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
-//	ZModel testModel("assets/models/boxes/boxes.fbx");
+//	//ZModel testModel("assets/models/nanosuit/nanosuit.fbx");
+//	//ZModel testModel("assets/models/box.fbx");
+//	ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
+//	//ZModel testModel("assets/models/small-scene/smallscene.fbx");
+//	//ZModel testModel("assets/models/boxes/boxes.fbx");
 //	//ZModel testModel_Ground("assets/models/ground/ground.obj");
 //	//testModel.meshes[3].PrintMM();
 //
@@ -223,8 +224,52 @@
 //
 //
 //	//创建着色器
-//	Shader myShader1("shaders/openGLLearning25/vertexShader.vs.c", "shaders/openGLLearning25/fragmentShader1.fs.c");
+//	Shader myShader1("shaders/openGLLearning30/vertexShader.vs.c", "shaders/openGLLearning30/fragmentShader1.fs.c");//带几何着色器
 //	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");
+//
+//	//一个简单的四边形
+//	float sampleQua[] = {
+//		//位置					颜色
+//		-0.05f,  0.05f,		1.0f, 0.0f, 0.0f,
+//		 0.05f, -0.05f,		0.0f, 1.0f, 0.0f,
+//		-0.05f, -0.05f,		0.0f, 0.0f, 1.0f,
+//		-0.05f,  0.05f,		1.0f, 0.0f, 0.0f,
+//		 0.05f, -0.05f,		0.0f, 1.0f, 0.0f,
+//		 0.05f,  0.05f,		0.0f, 1.0f, 1.0f
+//	};
+//	//添加100个浮点值到数组中
+//	glm::vec2 to_offsets[100];
+//	unsigned int index = 0;
+//	for (int i = -9; i < 11; i += 2) {
+//		for (int j = -9; j < 11; j += 2) {
+//			glm::vec2 temp_offset;
+//			temp_offset.x = float(j) / 10.0f;
+//			temp_offset.y = float(i) / 10.0f;
+//			to_offsets[index++] = temp_offset;
+//		}
+//	}
+//	//生成一个offset缓冲
+//	unsigned int instanceVBO;
+//	glGenBuffers(1, &instanceVBO);
+//	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &to_offsets[0], GL_STATIC_DRAW);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//	unsigned int sampleVAO, sampleVBO;
+//	glGenBuffers(1, &sampleVBO);
+//	glGenVertexArrays(1, &sampleVAO);
+//	glBindVertexArray(sampleVAO);
+//	glBindBuffer(GL_ARRAY_BUFFER, sampleVBO);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(sampleQua), sampleQua, GL_STATIC_DRAW);
+//	glEnableVertexAttribArray(0);
+//	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+//	glEnableVertexAttribArray(1);
+//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
+//	//将offset缓冲绑定到VBO的第二个属性上面
+//	glEnableVertexAttribArray(2);
+//	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+//	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//	glVertexAttribDivisor(2, 1);//告诉OpenGL每渲染一个新实例的时候更新顶点属性(第一个参数是属性序号,第二参数默认0表示每次迭代循环就更新一次)
 //
 //	myShader1_skybox.Use();
 //	myShader1_skybox.SetInt("cubemap", 0);
@@ -240,7 +285,7 @@
 //		//渲染指令
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除颜色缓冲和深度缓冲
-//		
+//
 //		//第一个渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
 //		glDepthFunc(GL_LEQUAL);
 //		myShader1_skybox.Use();
@@ -252,16 +297,13 @@
 //		glDrawArrays(GL_TRIANGLES, 0, 36);
 //		glDepthFunc(GL_LESS);
 //		//然后绘制其他场景
+//		//开启深度测试
+//		glEnable(GL_DEPTH_TEST);
 //		//激活这个程序对象
 //		myShader1.Use();
-//		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
-//		glm::mat4 tempModel = glm::mat4(1.0f);
-//		tempModel = glm::scale(tempModel, glm::vec3(0.8f));
-//		//渲染点的大小
-//		//glEnable(GL_PROGRAM_POINT_SIZE);
-//		testModel.Draw(&myShader1, tempModel, zcamera.cameraPos, GL_TRIANGLES);
+//		glBindVertexArray(sampleVAO);
+//		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100);
+//		glBindVertexArray(0);
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数
@@ -269,6 +311,8 @@
 //	//释放缓冲内存
 //	glDeleteVertexArrays(1, &boxVAO);
 //	glDeleteBuffers(1, &boxVBO);
+//	glDeleteVertexArrays(1, &sampleVAO);
+//	glDeleteBuffers(1, &sampleVBO);
 //
 //	glfwTerminate();	//渲染结束后我们需要释放所有的分配资源,此函数可以完成
 //	return 0;

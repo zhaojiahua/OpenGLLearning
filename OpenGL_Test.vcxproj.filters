@@ -111,6 +111,27 @@
     <ClCompile Include="openGLLearning25_advancedGLSL.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="openGLLearning26_GeometryShader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning27_Explor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning28_ShowNormal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning29_Instance.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning30_InstanceArray.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning31_asteroidBelt.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning32_asteroidBelt_Instance.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

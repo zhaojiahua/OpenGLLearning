@@ -3,35 +3,6 @@
 
 #include <map>
 
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma=false) {
-	string filename = string(path);
-	filename = directory + '/' + filename;
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	int width, height, nrComponents;
-	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-	if (data) {
-		GLenum format;
-		if (nrComponents == 1)format = GL_RED;
-		else if (nrComponents == 3)format = GL_RGB;
-		else if (nrComponents == 4)format = GL_RGBA;
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_image_free(data);
-	}
-	else {
-		cout << "Texture failed to load at path: " << path << endl;
-		stbi_image_free(data);
-	}
-	return textureID;
-}
-
 ZMesh::ZMesh(){
 	
 }
@@ -50,7 +21,6 @@ void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix,unsigned int DrawMode)
 	unsigned int specularNr = 1;
 	unsigned int normalNr = 1;
 	unsigned int heightNr = 1;
-	
 	if (mTextures.size() > 0) {
 		//绑定相应的纹理单元
 		for (unsigned int i = 0; i < mTextures.size(); i++) {
@@ -63,7 +33,7 @@ void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix,unsigned int DrawMode)
 			else if (name == "texture_normal")num = to_string(normalNr++);
 			else if (name == "texture_height")num = to_string(heightNr++);
 			inshader->SetInt(("material." + name + num).c_str(), i);
-			inshader->SetMat4f("m_matrix", inMMatrix * MMatrix);
+			inshader->SetMat4f("m_matrix", inMMatrix * mMatrix);
 		}
 	}
 	else {//如果没有任何贴图数据的话就要启用默认漫反射颜色不至于场景完全黑暗
@@ -77,12 +47,66 @@ void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix,unsigned int DrawMode)
 	glActiveTexture(GL_TEXTURE0);
 }
 
+void ZMesh::DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMMatrix, unsigned int DrawMode)
+{
+	//生成一个顶点缓冲对象(为顶点续属性)
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), inMMatrix, GL_STATIC_DRAW);
+	glBindVertexArray(mVAO);
+	//顶点属性(由于顶点属性的最大数据量是vec4,所以我们只能将mat4拆分成4个属性分别存放)
+	GLsizei vec4Size = sizeof(glm::vec4);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(vec4Size));
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2*vec4Size));
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3*vec4Size));
+	glVertexAttribDivisor(3, 1);
+	glVertexAttribDivisor(4, 1);
+	glVertexAttribDivisor(5, 1);
+	glVertexAttribDivisor(6, 1);
+	glBindVertexArray(0);
+
+	unsigned int diffuseNr = 1;
+	unsigned int specularNr = 1;
+	unsigned int normalNr = 1;
+	unsigned int heightNr = 1;
+	if (mTextures.size() > 0) {
+		//绑定相应的纹理单元
+		for (unsigned int i = 0; i < mTextures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);//激活相应的纹理单元
+			glBindTexture(GL_TEXTURE_2D, mTextures[i].id);
+			string num;
+			string name = mTextures[i].type;
+			if (name == "texture_diffuse")num = to_string(diffuseNr++);
+			else if (name == "texture_specular")num = to_string(specularNr++);
+			else if (name == "texture_normal")num = to_string(normalNr++);
+			else if (name == "texture_height")num = to_string(heightNr++);
+			inshader->SetInt(("material." + name + num).c_str(), i);
+			inshader->SetMat4f("m_matrix", mMatrix);
+		}
+	}
+	else {//如果没有任何贴图数据的话就要启用默认漫反射颜色不至于场景完全黑暗
+		inshader->SetVec4f("tempdiffuse_", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+	}
+
+	//绘制网格
+	glBindVertexArray(mVAO);
+	glDrawElementsInstanced(DrawMode, mIndices.size(), GL_UNSIGNED_INT, 0, amount);
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
+}
+
 void ZMesh::PrintMM()
 {
-	cout << MMatrix[0][0] << " " << MMatrix[0][1] << " " << MMatrix[0][2] << " " << MMatrix[0][3] << endl;
-	cout << MMatrix[1][0] << " " << MMatrix[1][1] << " " << MMatrix[1][2] << " " << MMatrix[1][3] << endl;
-	cout << MMatrix[2][0] << " " << MMatrix[2][1] << " " << MMatrix[2][2] << " " << MMatrix[2][3] << endl;
-	cout << MMatrix[3][0] << " " << MMatrix[3][1] << " " << MMatrix[3][2] << " " << MMatrix[3][3] << endl;
+	cout << mMatrix[0][0] << " " << mMatrix[0][1] << " " << mMatrix[0][2] << " " << mMatrix[0][3] << endl;
+	cout << mMatrix[1][0] << " " << mMatrix[1][1] << " " << mMatrix[1][2] << " " << mMatrix[1][3] << endl;
+	cout << mMatrix[2][0] << " " << mMatrix[2][1] << " " << mMatrix[2][2] << " " << mMatrix[2][3] << endl;
+	cout << mMatrix[3][0] << " " << mMatrix[3][1] << " " << mMatrix[3][2] << " " << mMatrix[3][3] << endl;
 }
 
 void ZMesh::SetupMesh()
@@ -122,19 +146,74 @@ ZModel::ZModel(const char* path)
 void ZModel::Draw(Shader* inshader, glm::mat4 inMMatrix,glm::vec3 cameraPosition,unsigned int DrawMode)
 {
 	//给物体按距离排序,渲染的时候由远及近以此绘制
-	map<float, ZMesh>sorted;
-	//cout << meshes.size() << endl;
-	for (unsigned int i = 0; i < meshes.size(); i++) {
-		float distance = glm::length(cameraPosition - meshes[i].mPosition);
-		sorted[distance] = meshes[i];//根据distance的键值从低到高存储每一个mesh
+	vector<ZMesh>sorted;
+	if (meshes.size() > 0) {
+		sorted.push_back(meshes[0]);
+		for (unsigned int i = 1; i < meshes.size(); i++) {//根据distance的键值从低到高存储每一个mesh(根据distance距离值由大到小排列)
+			float distance = glm::length(cameraPosition - meshes[i].mPosition);
+			//(根据distance距离值由大到小排列)
+			for (unsigned int j = 0; j < sorted.size(); j++) {
+				float old_distance = glm::length(cameraPosition - sorted[j].mPosition);
+				if (distance >= old_distance) {
+					sorted.insert(sorted.begin() + j, meshes[i]);
+					break;//跳出内层循环
+				}
+			}
+		}
+		//顺序绘制每一个mesh
+		//cout << sorted.size() << endl;
+		for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
+			rit->Draw(inshader, inMMatrix, DrawMode);
+		}
 	}
-	//逆序绘制每一个mesh
-	for (map<float, ZMesh>::reverse_iterator rit = sorted.rbegin(); rit != sorted.rend(); rit++) {
-		rit->second.Draw(inshader, inMMatrix, DrawMode);
+}
+
+void ZModel::DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode)
+{
+	//给物体按距离排序,渲染的时候由远及近以此绘制
+	vector<ZMesh>sorted;
+	if (meshes.size() > 0) {
+		sorted.push_back(meshes[0]);
+		for (unsigned int i = 1; i < meshes.size(); i++) {//根据distance的键值从低到高存储每一个mesh(根据distance距离值由大到小排列)
+			float distance = glm::length(cameraPosition - meshes[i].mPosition);
+			//(根据distance距离值由大到小排列)
+			for (unsigned int j = 0; j < sorted.size(); j++) {
+				float old_distance = glm::length(cameraPosition - sorted[j].mPosition);
+				if (distance >= old_distance) {
+					sorted.insert(sorted.begin() + j, meshes[i]);
+					break;//跳出内层循环
+				}
+			}
+		}
+		//顺序绘制每一个mesh
+		//cout << sorted.size() << endl;
+		for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
+			rit->DrawInstance(inshader, amount, inMMatrix, DrawMode);
+		}
 	}
-	//for (auto mesh : meshes) {
-	//	mesh.Draw(inshader, inMMatrix);
-	//}
+}
+
+unsigned int ZModel::LoadCubeMap(vector<string> textures_faces)
+{
+	unsigned int texture_box;
+	glGenTextures(1, &texture_box);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture_box);
+	//遍历纹理目标
+	int texC_width, texC_height, texC_nrChannels;
+	for (unsigned int i = 0; i < textures_faces.size(); i++) {
+		unsigned char* tempdata = stbi_load(textures_faces[i].c_str(), &texC_width, &texC_height, &texC_nrChannels, 0);
+		if (tempdata) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, texC_width, texC_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tempdata);
+		}
+		else cout << "Cubemap texture failed to load at path:" << textures_faces[i] << endl;
+		stbi_image_free(tempdata);
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	return texture_box;
 }
 
 void ZModel::LoadModel(string path)
@@ -214,9 +293,39 @@ ZMesh ZModel::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 nodeM,gl
 		meshTextures.insert(meshTextures.end(), heightTexs.begin(), heightTexs.end());
 	}
 	ZMesh tempMesh= ZMesh(meshVertices, meshIndices, meshTextures);
-	tempMesh.MMatrix = nodeM;
+	tempMesh.mMatrix = nodeM;
 	tempMesh.mPosition = mposition;
 	return tempMesh;
+}
+
+unsigned int ZModel::TextureFromFile(const char* path, const string& directory, bool gamma)
+{
+	string filename = string(path);
+	filename = directory + '/' + filename;
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	int width, height, nrComponents;
+	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+	if (data) {
+		GLenum format;
+		if (nrComponents == 1)format = GL_RED;
+		else if (nrComponents == 3)format = GL_RGB;
+		else if (nrComponents == 4)format = GL_RGBA;
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	}
+	else {
+		cout << "Texture failed to load at path: " << path << endl;
+		stbi_image_free(data);
+	}
+	return textureID;
 }
 
 vector<ZTexture> ZModel::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)

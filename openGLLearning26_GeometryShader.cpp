@@ -155,6 +155,25 @@
 //	//ZModel testModel_Ground("assets/models/ground/ground.obj");
 //	//testModel.meshes[3].PrintMM();
 //
+//	float simplepoints[] = {
+//		-0.5f,	0.5f,		0.0f,			1.0f,	0.2f,	0.0f,
+//		 0.5f,		0.5f,		0.0f,			0.0f,	1.0f,	0.2f,
+//		 0.5f,		-0.5f,	0.0f,			1.0f,	0.9f,	0.1f,
+//		-0.5f,	-0.5f,	0.0f,			0.0f,	0.2f,	1.0f
+//	};
+//	unsigned int simpleVAO, simpleVBO;
+//	glGenBuffers(1, &simpleVBO);
+//	glGenVertexArrays(1, &simpleVAO);
+//	glBindVertexArray(simpleVAO);
+//	glBindBuffer(GL_ARRAY_BUFFER, simpleVBO);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(simplepoints), simplepoints, GL_STATIC_DRAW);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+//	glEnableVertexAttribArray(0);
+//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+//	glEnableVertexAttribArray(1);
+//	glBindVertexArray(0);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//
 //	//天空盒模型数据
 //	float skyboxVertices[] = {
 //		-1.0f,  1.0f, -1.0f,
@@ -223,7 +242,14 @@
 //
 //
 //	//创建着色器
+//	/*Shader myShader1;
+//	myShader1.GenVertexShader("shaders/openGLLearning25/vertexShader.vs.c");
+//	myShader1.GenGeometryShader("shaders/openGLLearning25/geometryShader.vs.c");
+//	myShader1.GenFragmentShader("shaders/openGLLearning25/fragmentShader1.fs.c");*/
 //	Shader myShader1("shaders/openGLLearning25/vertexShader.vs.c", "shaders/openGLLearning25/fragmentShader1.fs.c");
+//	//Shader myShader1_geometry("shaders/openGLLearning26/vertexShader.vs.c", "shaders/openGLLearning26/fragmentShader1.fs.c");
+//	//Shader myShader1("shaders/openGLLearning26/vertexShader.vs.c", "shaders/openGLLearning26/fragmentShader1.fs.c");//不带几何着色器
+//	Shader myShader1_geometry("shaders/openGLLearning26/vertexShader.vs.c", "shaders/openGLLearning26/fragmentShader1.fs.c", "shaders/openGLLearning26/geometryShader.vs.c");//带几何着色器
 //	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");
 //
 //	myShader1_skybox.Use();
@@ -240,7 +266,7 @@
 //		//渲染指令
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除颜色缓冲和深度缓冲
-//		
+//
 //		//第一个渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
 //		glDepthFunc(GL_LEQUAL);
 //		myShader1_skybox.Use();
@@ -257,11 +283,12 @@
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraViewMatrix()));
 //		glUniformMatrix4fv(glGetUniformLocation(myShader1.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
-//		glm::mat4 tempModel = glm::mat4(1.0f);
-//		tempModel = glm::scale(tempModel, glm::vec3(0.8f));
-//		//渲染点的大小
-//		//glEnable(GL_PROGRAM_POINT_SIZE);
-//		testModel.Draw(&myShader1, tempModel, zcamera.cameraPos, GL_TRIANGLES);
+//		glm::mat4 tempModelM = glm::mat4(1.0f);
+//		tempModelM = glm::scale(tempModelM, glm::vec3(0.8f));
+//		testModel.Draw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
+//		myShader1_geometry.Use();
+//		glBindVertexArray(simpleVAO);
+//		glDrawArrays(GL_POINTS, 0, 4);
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数
@@ -269,6 +296,8 @@
 //	//释放缓冲内存
 //	glDeleteVertexArrays(1, &boxVAO);
 //	glDeleteBuffers(1, &boxVBO);
+//	glDeleteVertexArrays(1, &simpleVAO);
+//	glDeleteBuffers(1, &simpleVBO);
 //
 //	glfwTerminate();	//渲染结束后我们需要释放所有的分配资源,此函数可以完成
 //	return 0;

@@ -163,6 +163,13 @@
     <ClCompile Include="openGLLearning23_BoxMap.cpp" />
     <ClCompile Include="openGLLearning25_advancedGLSL.cpp" />
     <ClCompile Include="openGLLearning24_Reflect.cpp" />
+    <ClCompile Include="openGLLearning26_GeometryShader.cpp" />
+    <ClCompile Include="openGLLearning27_Explor.cpp" />
+    <ClCompile Include="openGLLearning28_ShowNormal.cpp" />
+    <ClCompile Include="openGLLearning29_Instance.cpp" />
+    <ClCompile Include="openGLLearning30_InstanceArray.cpp" />
+    <ClCompile Include="openGLLearning31_asteroidBelt.cpp" />
+    <ClCompile Include="openGLLearning32_asteroidBelt_Instance.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
     <ClCompile Include="ZDirectionLight.cpp" />
