@@ -1,118 +1,4 @@
-//#define STB_IMAGE_IMPLEMENTATION
-//#include "stb_image.h"
-//
-//#include <glad/glad.h>
-//#include <GLFW/glfw3.h>
-//
-//#include <iostream>
-//#include <filesystem>
-//
-//#include "Shader.h"
-//#include "ZCamera.h"
-//#include "ZDirectionLight.h"
-//#include "ZPointLight.h"
-//#include "ZSpotLight.h"
-//#include "ZMesh.h"
-//
-//using namespace std;
-//
-////设置屏幕宽高
-//unsigned int screenWidth = 1400;
-//unsigned int screenHeight = 1000;
-////计算deltaTime
-//float deltaTime = 0.0f;
-//float lastFrame = 0.0f;
-//
-////创建一个摄像机
-//ZCamera zcamera(45.0f, static_cast<float>(screenWidth) / static_cast<float>(screenHeight), 0.1f, 500.0f);
-//
-////设置鼠标初始位置(鼠标的起始位置设置带屏幕的中心)
-//float lastX = screenWidth / 2, lastY = screenHeight / 2;
-//bool firstMouse = true;//第一次移动鼠标
-//
-////窗口大小发生变化时候的回调函数
-//void Framebuffer_size_callback(GLFWwindow* inWind, int inWidth, int inHeight) {
-//	glViewport(0, 20, inWidth, inHeight - 40);
-//}
-////鼠标移动回调函数
-//void Mouse_move_callback(GLFWwindow* inWind, double xpos, double ypos) {
-//	if (firstMouse) {
-//		lastX = xpos;
-//		lastY = ypos;
-//		firstMouse = false;
-//	}
-//	float xoffset = (xpos - lastX) * zcamera.sensitivity;
-//	float yoffset = (ypos - lastY) * zcamera.sensitivity;
-//	lastX = xpos;
-//	lastY = ypos;
-//	zcamera.SetCameraFront(xoffset, yoffset);
-//}
-////鼠标滚轮回调函数
-//void Mouse_scroll_callback(GLFWwindow* inWind, double xoffset, double yoffset) {
-//	zcamera.SetCameraFov(yoffset);
-//}
-//
-////输入响应函数
-//void ProcessInput(GLFWwindow* inWind, Shader inshader) {
-//	if (glfwGetKey(inWind, GLFW_KEY_ESCAPE) == GLFW_PRESS) {//如果检测到ESC键被按下
-//		glfwSetWindowShouldClose(inWind, true);	//设置glfwWindowShouldClose为TRUE
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_UP) == GLFW_PRESS) {//如果检测到up键被按下
-//		inshader.Use();
-//		float tempvalue = inshader.GetFloat("mixValue");
-//		tempvalue += 0.0002;
-//		if (tempvalue > 1.0f) tempvalue = 1.0f;
-//		inshader.SetFloat("mixValue", tempvalue);
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_DOWN) == GLFW_PRESS) {//如果检测到down键被按下
-//		inshader.Use();
-//		float tempvalue = inshader.GetFloat("mixValue");
-//		tempvalue -= 0.0002;
-//		if (tempvalue < 0.0f) tempvalue = 0.0f;
-//		inshader.SetFloat("mixValue", tempvalue);
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_W) == GLFW_PRESS) {//W键按下相机向前运动
-//		zcamera.MoveForward();
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_S) == GLFW_PRESS) {//S键按下相机向后运动
-//		zcamera.MoveBackward();
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_A) == GLFW_PRESS) {//A键按下相机向左运动
-//		zcamera.MoveLeft();
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_D) == GLFW_PRESS) {//D键按下相机向右运动
-//		zcamera.MoveRight();
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_SPACE) == GLFW_PRESS) {//空格键按下相机向上运动
-//		zcamera.MoveUpWard();
-//	}
-//	if (glfwGetKey(inWind, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {//shift+空格键按下相机向下运动
-//		zcamera.MoveDownWard();
-//	}
-//}
-//
-////加载天空盒子
-//unsigned int LoadCubeMap(vector<string> textures_faces) {
-//	unsigned int texture_box;
-//	glGenTextures(1, &texture_box);
-//	glBindTexture(GL_TEXTURE_CUBE_MAP, texture_box);
-//	//遍历纹理目标
-//	int texC_width, texC_height, texC_nrChannels;
-//	for (unsigned int i = 0; i < textures_faces.size(); i++) {
-//		unsigned char* tempdata = stbi_load(textures_faces[i].c_str(), &texC_width, &texC_height, &texC_nrChannels, 0);
-//		if (tempdata) {
-//			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, texC_width, texC_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tempdata);
-//		}
-//		else cout << "Cubemap texture failed to load at path:" << textures_faces[i] << endl;
-//		stbi_image_free(tempdata);
-//	}
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-//	return texture_box;
-//}
+//#include "GlobalFunctions.h"
 //
 //int main()
 //{
@@ -121,6 +7,7 @@
 //	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 //	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 //	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+//	glfwWindowHint(GLFW_SAMPLES, 4);	//创建多重采样样本缓冲(每个像素存储4个子样本)
 //
 //	//创建一个窗口于对象,这个窗口对象存放了和所有窗口相关的数据,而且会被频繁用到
 //	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "ZJHOpenGL", NULL, NULL);
@@ -148,45 +35,19 @@
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
 //
 //	//加载模型数据
-//	ZModel testModel("assets/models/nanosuit/nanosuit.fbx");
+//	//ZModel testModel("assets/models/nanosuit/nanosuit.fbx");
 //	//ZModel testModel("assets/models/box.fbx");
 //	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
+//	//ZModel testModel("assets/models/woodfloor/floor.obj");
 //	//ZModel testModel("assets/models/boxes/boxes.fbx");
-//	//ZModel testModel_Ground("assets/models/ground/ground.obj");
+//	ZModel testModel("assets/models/ground/ground.obj");
 //	//ZModel testModel("assets/models/skybox/box.fbx");
-//	ZModel testModel_planet("assets/models/planet/planet.obj");
-//	ZModel testModel_rock("assets/models/rock/rock.obj");
-//
-//	//1000个模型矩阵,生产1000个围绕行星的小碎石
-//	unsigned int amount = 10000;
-//	glm::mat4* modelMatrices = new glm::mat4[amount];
-//	srand(glfwGetTime());//初始化随机种子,用时间戳来初始化rand随机函数的种子才会产生真随机数,否则的话rand函数产生的是伪随机
-//	float radius = 30.0f;
-//	float offset = 10.5f;
-//	for (unsigned int i = 0; i < amount; i++) {
-//		glm::mat4 tempMM(1.0f);
-//		//移动(在360的方向上随机)
-//		float angle = (float)i / 1000.0f * 360.0f;
-//		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-//		float x = sin(angle) * radius + displacement;
-//		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-//		float y = 0.4f * displacement;
-//		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-//		float z = cos(angle) * radius + displacement;
-//		tempMM = glm::translate(tempMM, glm::vec3(x, y, z));
-//		//旋转(绕某个固定轴线旋转一个随机角度)
-//		float rotAngle = (rand() % 360);
-//		tempMM = glm::rotate(tempMM, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-//		//缩放(随机大小缩放值在0.05-0.25之间)
-//		float rscale = (rand() % 20) / 100.0f + 0.05f;
-//		tempMM = glm::scale(tempMM, glm::vec3(rscale));
-//		modelMatrices[i] = tempMM;
-//	}
+//	//ZModel testModel("assets/models/aixia/aixia.obj");
 //
 //	//配置平行光源(红色调)
-//	ZDirectionLight directionLight(glm::vec4(1.0f, 0.85f, 0.8f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+//	ZDirectionLight directionLight(glm::vec4(0.1f, 0.05f, 0.0f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
 //	//配置聚光灯(绿色调)
-//	ZSpotLight spotLight(glm::vec4(0.3f, 0.5f, 0.35f, 1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
+//	ZSpotLight spotLight(glm::vec4(0.85f, 1.0f, 0.9f, 1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 //
 //	//天空盒模型数据
 //	float skyboxVertices[] = {
@@ -255,7 +116,7 @@
 //	unsigned int cubemap = LoadCubeMap(faces);
 //
 //	//创建着色器
-//	Shader myShader1("shaders/openGLLearning32/vertexShader.vs.c", "shaders/openGLLearning32/fragmentShader1.fs.c");
+//	Shader myShader1("shaders/openGLLearning33/vertexShader.vs.c", "shaders/openGLLearning33/fragmentShader1.fs.c");
 //	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");
 //
 //	//设置采样器对应的纹理单元
@@ -264,6 +125,9 @@
 //	//把灯光信息传递给shader
 //	directionLight.SetLight(&myShader1, 0, 0.1f, 0.5f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 //	spotLight.SetLight(&myShader1, 0, 0.1f, 0.6f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+//	//以相机的位置和方向设置聚光灯
+//	myShader1.SetVec3f("spotlights[0].position", glm::vec3(0.0f, 20.0f, 0.0f));
+//	myShader1.SetVec3f("spotlights[0].direction", glm::vec3(0.0f, -1.0f, 0.0f));
 //
 //	myShader1_skybox.Use();
 //	myShader1_skybox.SetInt("cubemap", 0);
@@ -274,7 +138,7 @@
 //		float currentFrame = glfwGetTime();
 //		deltaTime = currentFrame - lastFrame;
 //		lastFrame = currentFrame;
-//		zcamera.cameraMoveSpeed = 10.0f * deltaTime;
+//		zcamera.cameraMoveSpeed = 50.0f * deltaTime;
 //
 //		//渲染指令
 //		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
@@ -293,17 +157,14 @@
 //		//然后绘制其他场景
 //		//开启深度测试
 //		glEnable(GL_DEPTH_TEST);
+//		glEnable(GL_MULTISAMPLE);//开启多重采样绘制(默认都是开启的)
+//		glEnable(GL_FRAMEBUFFER_SRGB);//开启gamma校正
 //		//激活这个程序对象
 //		myShader1.Use();
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
-//		//以相机的位置和方向设置聚光灯
-//		myShader1.SetVec3f("spotlights[0].position", zcamera.cameraPos);
-//		myShader1.SetVec3f("spotlights[0].direction", zcamera.GetCameraFront());
 //		myShader1.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
 //		myShader1.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
-//		//testModel_planet.Draw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
-//		//绘制小行星
-//		testModel_rock.DrawInstance(&myShader1, amount, &modelMatrices[0], zcamera.cameraPos, GL_TRIANGLES);
+//		testModel.Draw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数
