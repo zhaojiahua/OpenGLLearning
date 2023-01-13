@@ -33,13 +33,85 @@ void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix,unsigned int DrawMode)
 			else if (name == "texture_normal")num = to_string(normalNr++);
 			else if (name == "texture_height")num = to_string(heightNr++);
 			inshader->SetInt(("material." + name + num).c_str(), i);
-			inshader->SetMat4f("m_matrix", inMMatrix * mMatrix);
 		}
 	}
 	else {//如果没有任何贴图数据的话就要启用默认漫反射颜色不至于场景完全黑暗
+		//cout << "no texture" << endl;
 		inshader->SetVec4f("tempdiffuse_", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
 	}
-	
+	inshader->SetMat4f("m_matrix", inMMatrix * mMatrix);
+	//绘制网格
+	glBindVertexArray(mVAO);
+	glDrawElements(DrawMode, mIndices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
+}
+
+void ZMesh::DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode,unsigned int shadowmap)
+{
+	unsigned int diffuseNr = 1;
+	unsigned int specularNr = 1;
+	unsigned int normalNr = 1;
+	unsigned int heightNr = 1;
+	unsigned int i = 0;
+	if (mTextures.size() > 0) {
+		//绑定相应的纹理单元
+		for ( i = 0; i < mTextures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);//激活相应的纹理单元
+			glBindTexture(GL_TEXTURE_2D, mTextures[i].id);
+			string num;
+			string name = mTextures[i].type;
+			if (name == "texture_diffuse")num = to_string(diffuseNr++);
+			else if (name == "texture_specular")num = to_string(specularNr++);
+			else if (name == "texture_normal")num = to_string(normalNr++);
+			else if (name == "texture_height")num = to_string(heightNr++);
+			inshader->SetInt(("material." + name + num).c_str(), i);
+		}
+	}
+	else {//如果没有任何贴图数据的话就要启用默认漫反射颜色不至于场景完全黑暗
+		//cout << "no texture" << endl;
+		inshader->SetVec4f("tempdiffuse_", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+	}
+	glActiveTexture(GL_TEXTURE0 + i + 1);
+	glBindTexture(GL_TEXTURE_2D, shadowmap);
+	inshader->SetInt("shadowMap", i + 1);
+	inshader->SetMat4f("m_matrix", inMMatrix * mMatrix);
+	//绘制网格
+	glBindVertexArray(mVAO);
+	glDrawElements(DrawMode, mIndices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
+}
+
+void ZMesh::DrawWithCubeShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode, unsigned int shadowmap)
+{
+	unsigned int diffuseNr = 1;
+	unsigned int specularNr = 1;
+	unsigned int normalNr = 1;
+	unsigned int heightNr = 1;
+	unsigned int i = 0;
+	if (mTextures.size() > 0) {
+		//绑定相应的纹理单元
+		for (i = 0; i < mTextures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);//激活相应的纹理单元
+			glBindTexture(GL_TEXTURE_2D, mTextures[i].id);
+			string num;
+			string name = mTextures[i].type;
+			if (name == "texture_diffuse")num = to_string(diffuseNr++);
+			else if (name == "texture_specular")num = to_string(specularNr++);
+			else if (name == "texture_normal")num = to_string(normalNr++);
+			else if (name == "texture_height")num = to_string(heightNr++);
+			inshader->SetInt(("material." + name + num).c_str(), i);
+		}
+	}
+	else {//如果没有任何贴图数据的话就要启用默认漫反射颜色不至于场景完全黑暗
+		//cout << "no texture" << endl;
+		inshader->SetVec4f("tempdiffuse_", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+	}
+	glActiveTexture(GL_TEXTURE0 + i + 1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, shadowmap);
+	inshader->SetInt("shadowMap", i + 1);
+	inshader->SetMat4f("m_matrix", inMMatrix * mMatrix);
 	//绘制网格
 	glBindVertexArray(mVAO);
 	glDrawElements(DrawMode, mIndices.size(), GL_UNSIGNED_INT, 0);
@@ -101,6 +173,31 @@ void ZMesh::DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMMa
 	glActiveTexture(GL_TEXTURE0);
 }
 
+void ZMesh::DrawDepth(Shader* inshader)
+{
+	inshader->SetMat4f("m_matrix", mMatrix);
+	//绘制网格
+	glBindVertexArray(mVAO);
+	glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+
+void ZMesh::SampleDraw(Shader* inshader)
+{
+	inshader->SetMat4f("m_matrix", glm::mat4(1.0f));
+	//inshader->SetInt("diffTex", 0);
+	//绘制网格
+	glBindVertexArray(mVAO);
+	glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+unsigned int ZMesh::GetVAO()
+{
+	return mVAO;
+}
+
 void ZMesh::PrintMM()
 {
 	cout << mMatrix[0][0] << " " << mMatrix[0][1] << " " << mMatrix[0][2] << " " << mMatrix[0][3] << endl;
@@ -152,12 +249,19 @@ void ZModel::Draw(Shader* inshader, glm::mat4 inMMatrix,glm::vec3 cameraPosition
 		for (unsigned int i = 1; i < meshes.size(); i++) {//根据distance的键值从低到高存储每一个mesh(根据distance距离值由大到小排列)
 			float distance = glm::length(cameraPosition - meshes[i].mPosition);
 			//(根据distance距离值由大到小排列)
-			for (unsigned int j = 0; j < sorted.size(); j++) {
-				float old_distance = glm::length(cameraPosition - sorted[j].mPosition);
+			vector<ZMesh>::iterator temp_it = sorted.begin();
+			while (true) {
+				float old_distance = glm::length(cameraPosition - temp_it->mPosition);
 				if (distance >= old_distance) {
-					sorted.insert(sorted.begin() + j, meshes[i]);
-					break;//跳出内层循环
+					sorted.insert(temp_it, meshes[i]);
+					break;//跳出循环
 				}
+				if (temp_it == sorted.end()) {//说明走到了最后
+					sorted.push_back(meshes[i]);
+					break;//跳出循环
+				}
+				temp_it++;
+			}
 			}
 		}
 		//顺序绘制每一个mesh
@@ -165,6 +269,67 @@ void ZModel::Draw(Shader* inshader, glm::mat4 inMMatrix,glm::vec3 cameraPosition
 		for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
 			rit->Draw(inshader, inMMatrix, DrawMode);
 		}
+}
+
+void ZModel::DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode, unsigned int shadowmap)
+{
+	//给物体按距离排序,渲染的时候由远及近以此绘制
+	vector<ZMesh>sorted;
+	if (meshes.size() > 0) {
+		sorted.push_back(meshes[0]);
+		for (unsigned int i = 1; i < meshes.size(); i++) {//根据distance的键值从低到高存储每一个mesh(根据distance距离值由大到小排列)
+			float distance = glm::length(cameraPosition - meshes[i].mPosition);
+			//(根据distance距离值由大到小排列)
+			vector<ZMesh>::iterator temp_it = sorted.begin();
+			while (true) {
+				float old_distance = glm::length(cameraPosition - temp_it->mPosition);
+				if (distance >= old_distance) {
+					sorted.insert(temp_it, meshes[i]);
+					break;//跳出循环
+				}
+				if (temp_it == sorted.end()) {//说明走到了最后
+					sorted.push_back(meshes[i]);
+					break;//跳出循环
+				}
+				temp_it++;
+			}
+		}
+	}
+	//顺序绘制每一个mesh
+	//cout << sorted.size() << endl;
+	for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
+		rit->DrawWithShadow(inshader, inMMatrix, DrawMode, shadowmap);
+	}
+}
+
+void ZModel::DrawWithCubeShadow(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode, unsigned int shadowmap)
+{
+	//给物体按距离排序,渲染的时候由远及近以此绘制
+	vector<ZMesh>sorted;
+	if (meshes.size() > 0) {
+		sorted.push_back(meshes[0]);
+		for (unsigned int i = 1; i < meshes.size(); i++) {//根据distance的键值从低到高存储每一个mesh(根据distance距离值由大到小排列)
+			float distance = glm::length(cameraPosition - meshes[i].mPosition);
+			//(根据distance距离值由大到小排列)
+			vector<ZMesh>::iterator temp_it = sorted.begin();
+			while (true) {
+				float old_distance = glm::length(cameraPosition - temp_it->mPosition);
+				if (distance >= old_distance) {
+					sorted.insert(temp_it, meshes[i]);
+					break;//跳出循环
+				}
+				if (temp_it == sorted.end()) {//说明走到了最后
+					sorted.push_back(meshes[i]);
+					break;//跳出循环
+				}
+				temp_it++;
+			}
+		}
+	}
+	//顺序绘制每一个mesh
+	//cout << sorted.size() << endl;
+	for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
+		rit->DrawWithCubeShadow(inshader, inMMatrix, DrawMode, shadowmap);
 	}
 }
 
@@ -177,12 +342,18 @@ void ZModel::DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMM
 		for (unsigned int i = 1; i < meshes.size(); i++) {//根据distance的键值从低到高存储每一个mesh(根据distance距离值由大到小排列)
 			float distance = glm::length(cameraPosition - meshes[i].mPosition);
 			//(根据distance距离值由大到小排列)
-			for (unsigned int j = 0; j < sorted.size(); j++) {
-				float old_distance = glm::length(cameraPosition - sorted[j].mPosition);
+			vector<ZMesh>::iterator temp_it = sorted.begin();
+			while (true) {
+				float old_distance = glm::length(cameraPosition - temp_it->mPosition);
 				if (distance >= old_distance) {
-					sorted.insert(sorted.begin() + j, meshes[i]);
-					break;//跳出内层循环
+					sorted.insert(temp_it, meshes[i]);
+					break;//跳出循环
 				}
+				if (temp_it == sorted.end()) {//说明走到了最后
+					sorted.push_back(meshes[i]);
+					break;//跳出循环
+				}
+				temp_it++;
 			}
 		}
 		//顺序绘制每一个mesh
@@ -190,6 +361,22 @@ void ZModel::DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMM
 		for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
 			rit->DrawInstance(inshader, amount, inMMatrix, DrawMode);
 		}
+	}
+}
+
+void ZModel::DrawDepth(Shader* inshader)
+{
+	//cout << sorted.size() << endl;
+	for (vector<ZMesh>::iterator rit = meshes.begin(); rit != meshes.end(); rit++) {
+		rit->DrawDepth(inshader);
+	}
+}
+
+
+void ZModel::SampleDraw(Shader* inshader)
+{
+	for (vector<ZMesh>::iterator rit = meshes.begin(); rit != meshes.end(); rit++) {
+		rit->SampleDraw(inshader);
 	}
 }
 
@@ -240,6 +427,7 @@ void ZModel::ProcessNode(aiNode* node, const aiScene* scene)
 		nodetransform.c1 , nodetransform.c2   ,nodetransform.c3 ,nodetransform.c4 ,
 		nodetransform.d1 , nodetransform.d2  , nodetransform.d3, nodetransform.d4
 	};
+	nodeM=glm::transpose(nodeM);
 	//处理节点所有的网格
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];

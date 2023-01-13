@@ -43,9 +43,20 @@ public:
 	ZMesh(vector<ZVertex> vertices, vector<unsigned int>indices, vector<ZTexture>textures);
 	//绘制函数
 	void Draw(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode);
+	//绘制带阴影
+	void DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode,unsigned int shadowmap);
+	//绘制带阴影(立方体阴影深度贴图)
+	void DrawWithCubeShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode, unsigned int shadowmap);
 	//通过实例化绘制(绘制量多的情况)
 	void DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMMatrix, unsigned int DrawMode);
-	//打印矩阵(用语调试)
+	//渲染阴影深度贴图
+	void DrawDepth(Shader* inshader);
+	//忽略贴图,只读取场景中的顶点位置信息绘制
+	void SampleDraw(Shader* inshader);
+
+	unsigned int GetVAO();
+
+	//打印矩阵(用于调试)
 	void PrintMM();
 
 private:
@@ -59,7 +70,11 @@ class ZModel
 public:
 	ZModel(const char* path);
 	void Draw(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition,unsigned int DrawMode);
+	void DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode, unsigned int shadowmap);
+	void DrawWithCubeShadow(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode, unsigned int shadowmap);
 	void DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode);
+	void DrawDepth(Shader* inshader);
+	void SampleDraw(Shader* inshader);
 
 	vector<ZTexture> textures_loaded;
 	//模型数据

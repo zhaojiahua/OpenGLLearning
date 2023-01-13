@@ -170,6 +170,10 @@
     <ClCompile Include="openGLLearning30_InstanceArray.cpp" />
     <ClCompile Include="openGLLearning31_asteroidBelt.cpp" />
     <ClCompile Include="openGLLearning32_asteroidBelt_Instance.cpp" />
+    <ClCompile Include="openGLLearning33_AntiAliasing.cpp" />
+    <ClCompile Include="openGLLearning35_RenderShadow.cpp" />
+    <ClCompile Include="openGLLearning34_ShadowMap.cpp" />
+    <ClCompile Include="openGLLearning36_PointShadow.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
     <ClCompile Include="ZDirectionLight.cpp" />
@@ -178,6 +182,7 @@
     <ClCompile Include="ZSpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GlobalFunctions.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="ZCamera.h" />
