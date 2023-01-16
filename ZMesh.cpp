@@ -92,7 +92,7 @@ void ZMesh::DrawWithCubeShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned i
 	unsigned int i = 0;
 	if (mTextures.size() > 0) {
 		//绑定相应的纹理单元
-		for (i = 0; i < mTextures.size(); i++) {
+		for (i = 0; i < mTextures.size(); ++i) {
 			glActiveTexture(GL_TEXTURE0 + i);//激活相应的纹理单元
 			glBindTexture(GL_TEXTURE_2D, mTextures[i].id);
 			string num;
@@ -472,12 +472,22 @@ ZMesh ZModel::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 nodeM,gl
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 		vector<ZTexture> diffuseTexs = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+		//if (diffuseTexs.size())cout << "diffuseTexs: " << diffuseTexs.size() << endl;
 		meshTextures.insert(meshTextures.end(), diffuseTexs.begin(), diffuseTexs.end());
 		vector<ZTexture> specularTexs = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		//if (diffuseTexs.size())cout << "specularTexs: " << specularTexs.size() << endl;
 		meshTextures.insert(meshTextures.end(), specularTexs.begin(), specularTexs.end());
-		vector<ZTexture> normalTexs = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+		vector<ZTexture> normalTexs = LoadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
+		//if (diffuseTexs.size())cout << "normalTexs: " << normalTexs.size() << endl;
 		meshTextures.insert(meshTextures.end(), normalTexs.begin(), normalTexs.end());
-		vector<ZTexture> heightTexs = LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+		vector<ZTexture> ambientTexs = LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_ambient");
+		//if (diffuseTexs.size())cout << "ambientTexs: " << ambientTexs.size() << endl;
+		meshTextures.insert(meshTextures.end(), ambientTexs.begin(), ambientTexs.end());
+		vector<ZTexture> emissiveTexs = LoadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive");
+		//if (diffuseTexs.size())cout << "emissiveTexs: " << emissiveTexs.size() << endl;
+		meshTextures.insert(meshTextures.end(), emissiveTexs.begin(), emissiveTexs.end());
+		vector<ZTexture> heightTexs = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height");
+		//if (diffuseTexs.size())cout << "heightTexs: " << heightTexs.size() << endl;
 		meshTextures.insert(meshTextures.end(), heightTexs.begin(), heightTexs.end());
 	}
 	ZMesh tempMesh= ZMesh(meshVertices, meshIndices, meshTextures);
