@@ -39,7 +39,8 @@
 //	//ZModel testModel("assets/models/box.fbx");
 //	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
 //	//ZModel testModel("assets/models/woodfloor/floor.fbx");
-//	ZModel testModel("assets/models/woodfloor/pointlightScene.fbx");
+//	ZModel testModel("assets/models/woodfloor/pointlightScene3.fbx");
+//	ZModel testModel_square("assets/models/woodfloor/square.obj");
 //	//ZModel testModel_showMap("assets/models/woodfloor/showshadowmap.obj");
 //	//ZModel testModel("assets/models/boxes/boxes.fbx");
 //	//ZModel testModel("assets/models/ground/ground.obj");
@@ -50,7 +51,7 @@
 //	//cout << testModel.meshes.size() << endl;
 //
 //	//配置点光源(蓝色调)(为了便于观察效果我们把点光源衰减程度降低)
-//	ZPointLight pointLight(glm::vec4(1.0f, 0.96f, 0.95f, 1.0f), glm::vec3(0.0f, 10.0f, -1.0f), 0.5f, 0.01f, 0.002f);
+//	ZPointLight pointLight(glm::vec4(10.0f, 9.0f, 7.5f, 1.0f), glm::vec3(0.0f, 10.0f, -1.0f), 0.8f, 0.02f, 0.002f);
 //
 //	//天空盒模型数据
 //	float skyboxVertices[] = {
@@ -120,8 +121,11 @@
 //	//创建着色器
 //	Shader myShader1_light("shaders/openGLLearning37/vertexShader_forlight.vs.c", "shaders/openGLLearning37/fragmentShader1_forlight.fs.c");//渲染光源用的
 //	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");//渲染天空盒子用的
-//	Shader myShader1_shadowmap("shaders/openGLLearning37/vertexShader_forshadowdepth.vs.c", "shaders/openGLLearning37/fragmentShader1_forshadowdepth.fs.c", "shaders/openGLLearning37/geometryShader1_forshadowdepth.gs.c");//渲染阴影深度贴图用的
-//	Shader myShader1("shaders/openGLLearning37/vertexShader.vs.c", "shaders/openGLLearning37/fragmentShader1.fs.c");
+//	//Shader myShader1_square("shaders/openGLLearning39/vertexShader_square.vs.c", "shaders/openGLLearning39/fragmentShader1_square.fs.c");//渲染面片用的
+//	//Shader myShader1_square("shaders/openGLLearning39/vertexShader_square.vs.c", "shaders/openGLLearning39/fragmentShader1_square_ReinhardToneMapping.fs.c");
+//	Shader myShader1_square("shaders/openGLLearning40/vertexShader_square.vs.c", "shaders/openGLLearning40/fragmentShader1_square.fs.c");
+//	Shader myShader1_gussblur("shaders/openGLLearning40/vertexShader_square.vs.c", "shaders/openGLLearning40/fragmentShader1_square_gussblur.fs.c");
+//	Shader myShader1("shaders/openGLLearning40/vertexShader.vs.c", "shaders/openGLLearning40/fragmentShader1.fs.c");
 //
 //	//设置采样器对应的纹理单元
 //	myShader1.Use();
@@ -138,55 +142,57 @@
 //	myShader1_light.Use();
 //	myShader1_light.SetVec4f("lightColor", pointLight.mLightColor);
 //
-//	//生成一个帧缓冲来存储渲染的深度贴图
-//	unsigned int shadowDepthMapFBO;
-//	glGenFramebuffers(1, &shadowDepthMapFBO);
-//	//生成一个立方体纹理提供给帧缓冲的深度缓冲使用****
-//	const GLuint shadowW = depthRes, shadowH = depthRes;//阴影深度贴图的分辨率
-//	unsigned int depthCubMap;
-//	glGenTextures(1, &depthCubMap);
-//	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubMap);
-//	for (GLuint i = 0; i < 6; ++i) {//这里一定要先自增再赋值
-//		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, shadowW, shadowH, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+//	glm::mat4 squareMM = glm::mat4(1.0f);
+//	squareMM = glm::scale(squareMM, glm::vec3(2.0f));
+//	myShader1_square.Use();
+//	//高曝光会是使暗部细节显示更多而使亮部更亮;低曝光会使亮部细节显示更多而使暗部更暗;
+//	//myShader1_square.SetFloat("exposure",5.0f);
+//	myShader1_square.SetFloat("exposure", 1.0f);
+//
+//	//生成一个浮点帧缓冲来存储渲染的HDR图像
+//	unsigned int hdrFBO;
+//	glGenFramebuffers(1, &hdrFBO);
+//	glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+//	//生成两张纹理附加颜色缓冲,分别存放颜色和亮度
+//	unsigned int hdrColorMaps[2];
+//	glGenTextures(2, hdrColorMaps);
+//	for (GLuint i = 0; i < 2; i++) {
+//		glBindTexture(GL_TEXTURE_2D, hdrColorMaps[i]);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);//颜色缓冲内部格式使用浮点类型
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, hdrColorMaps[i], 0);
 //	}
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-//	//把生成的深度纹理绑定到帧缓冲的深度缓冲(我们可以利用几何着色器一次性渲染6个不同方向的贴图,而不用渲染6次)
-//	glBindFramebuffer(GL_FRAMEBUFFER, shadowDepthMapFBO);
-//	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubMap, 0);
-//	glDrawBuffer(GL_NONE);//这两个GL_NONE一定要有,避免渲染到颜色缓冲区里面
-//	glReadBuffer(GL_NONE);
+//	unsigned int rboDepth;
+//	glGenRenderbuffers(1, &rboDepth);
+//	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+//	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
+//	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+//	GLuint attachments[2] = { GL_COLOR_ATTACHMENT0 ,GL_COLOR_ATTACHMENT1 };
+//	glDrawBuffers(2, attachments);
 //	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "framebuffer not complete" << endl;
 //	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //
-//	//从点光源视角渲染阴影深度贴图
-//	//从光源角度的相机使用透视投影矩阵(注意相机视角一定要设置90度,从每个角度映射的贴图才能正好无缝拼接)
-//	float point_far_plane = 50.0f;//透视远平面
-//	glm::mat4 perspectiveMM = glm::perspective(glm::radians(90.0f), (GLfloat)shadowW / (GLfloat)shadowH, 1.0f, point_far_plane);
-//	//从光源角度的分别看向6个方向,我们需要用到6个光空间变换矩阵,而且顺序要保持一致(右左上下近远)
-//	vector<glm::mat4>pointShadowMatrices;
-//	pointShadowMatrices.push_back(perspectiveMM * glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-//	pointShadowMatrices.push_back(perspectiveMM * glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-//	pointShadowMatrices.push_back(perspectiveMM * glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-//	pointShadowMatrices.push_back(perspectiveMM * glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-//	pointShadowMatrices.push_back(perspectiveMM * glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-//	pointShadowMatrices.push_back(perspectiveMM * glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-//	//向myShader1_shadowmap传入数据
-//	myShader1_shadowmap.Use();
-//	for (int i = 0; i < 6; i++) {
-//		myShader1_shadowmap.SetMat4f("pointShadowMatrices[" + to_string(i) + "]", pointShadowMatrices[i]);
+//	//为后期辉光效果创建一对乒乓缓冲
+//	GLuint pingpangFBO[2];
+//	GLuint pingpangBuffer[2];
+//	glGenFramebuffers(2,pingpangFBO);
+//	glGenTextures(2, pingpangBuffer);
+//	for (GLuint i = 0; i < 2; i++) {
+//		glBindFramebuffer(GL_FRAMEBUFFER, pingpangFBO[i]);
+//		glBindTexture(GL_TEXTURE_2D,pingpangBuffer[i]);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, pingpangBuffer[i], 0);
+//		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "framebuffer not complete" << endl;
+//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //	}
-//	myShader1_shadowmap.SetMat4f("m_matrix", glm::mat4(1.0f));
-//	myShader1_shadowmap.SetVec3f("lightPos", pointLight.mLightPosition);//传入点光源位置
-//	myShader1_shadowmap.SetFloat("far_plane", point_far_plane);//点光源远切平面
-//	//向myShader1传入数据
-//	myShader1.Use();
-//	myShader1.SetVec3f("lightPos", pointLight.mLightPosition);//传入点光源位置
-//	myShader1.SetFloat("pointlight_far_plane", point_far_plane);//点光源远切平面
-//
+//	glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //
 //	//保持渲染循环
 //	while (!glfwWindowShouldClose(window)) {	//如果检测到GLFW要求被关闭就结束循环
@@ -194,35 +200,15 @@
 //		float currentFrame = glfwGetTime();
 //		deltaTime = currentFrame - lastFrame;
 //		lastFrame = currentFrame;
-//		zcamera.cameraMoveSpeed = 10.0f * deltaTime;
+//		zcamera.cameraMoveSpeed = 20.0f * deltaTime;
 //
 //		//渲染指令
-//		//渲染深度贴图
-//		glViewport(0, 0, shadowW, shadowH);//注意设置视口分辨率等于深度贴图分辨率
-//		glBindFramebuffer(GL_FRAMEBUFFER, shadowDepthMapFBO);//渲染深度到指定的帧缓冲
-//		glClear(GL_DEPTH_BUFFER_BIT);//每一帧清除当前帧缓冲的深度缓冲
-//		glCullFace(GL_FRONT);//为解决彼得潘悬浮问题我们把正面裁减掉保留背面渲染阴影
-//		myShader1_shadowmap.Use();
-//		testModel.DrawDepth(&myShader1_shadowmap);
-//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//		glCullFace(GL_BACK);
 //
-//		//渲染场景
-//		glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
+//		//渲染场景到浮点帧缓冲的颜色缓冲中
+//		glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);//指定渲染缓冲区
+//		//glBindFramebuffer(GL_FRAMEBUFFER, 0);//指定渲染缓冲区
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除默认帧缓冲区的颜色缓冲和深度缓冲
 //		glViewport(0, 0, screenWidth, screenHeight);//记得把视口分辨率设置回来
-//		//第一个渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
-//		glDepthFunc(GL_LEQUAL);
-//		myShader1_skybox.Use();
-//		glm::mat4 viewM = glm::mat4(glm::mat3(zcamera.GetCameraViewMatrix()));//去除相机的位移信息,只保留相机的旋转信息
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1_skybox.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(viewM));
-//		glUniformMatrix4fv(glGetUniformLocation(myShader1_skybox.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
-//		glBindVertexArray(boxVAO);
-//		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
-//		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubMap);//测试一下深度贴图
-//		glDrawArrays(GL_TRIANGLES, 0, 36);
-//		glDepthFunc(GL_LESS);
-//		//然后绘制其他场景
 //		//开启深度测试
 //		glEnable(GL_DEPTH_TEST);
 //		glEnable(GL_MULTISAMPLE);//开启多重采样绘制(默认都是开启的)
@@ -232,15 +218,52 @@
 //		myShader1.SetVec3f("viewPos", zcamera.cameraPos);
 //		myShader1.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
 //		myShader1.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
-//		testModel.DrawWithCubeShadow(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES, depthCubMap);
-//
+//		testModel.Draw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
 //		//渲染点光物体
 //		myShader1_light.Use();
 //		myShader1_light.SetVec3f("viewPos", zcamera.cameraPos);
 //		myShader1_light.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
 //		myShader1_light.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
 //		testModel_Light.Draw(&myShader1_light, lightMM, zcamera.cameraPos, GL_TRIANGLES);
+//		glBindFramebuffer(GL_FRAMEBUFFER, 0);//场景渲染完成解绑浮点缓冲区
 //
+//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除默认帧缓冲区的颜色缓冲和深度缓冲
+//		//我们用亮部缓冲填充一个乒乓缓冲,并对其进行10次高斯模糊
+//		GLboolean horizontal = true, first_iteration = true;
+//		GLuint amount = 10;
+//		myShader1_gussblur.Use();
+//		for (GLuint i = 0; i < amount; i++) {
+//			glBindFramebuffer(GL_FRAMEBUFFER, pingpangFBO[horizontal]);
+//			myShader1_gussblur.SetInt("horizontal", horizontal);
+//			glBindTexture(GL_TEXTURE_2D, first_iteration ? hdrColorMaps[1] : pingpangBuffer[!horizontal]);
+//			myShader1_gussblur.SetInt("material.texture_diffuse1", hdrColorMaps[1]);
+//			//myShader1_gussblur.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
+//			//myShader1_gussblur.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
+//			testModel_square.SampleDraw(&myShader1_gussblur);
+//
+//			horizontal = !horizontal;
+//			if (first_iteration)first_iteration = false;
+//		}
+//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//
+//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除默认帧缓冲区的颜色缓冲和深度缓冲
+//		myShader1_square.Use();
+//		myShader1_square.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
+//		myShader1_square.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
+//		testModel_square.meshes[0].AddHeightMap(pingpangBuffer[0]);
+//		testModel_square.meshes[0].AddHeightMap(pingpangBuffer[1]);
+//		testModel_square.Draw(&myShader1_square, squareMM, zcamera.cameraPos, GL_TRIANGLES);
+//
+//		//渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
+//		glDepthFunc(GL_LEQUAL);
+//		myShader1_skybox.Use();
+//		glm::mat4 viewM = glm::mat4(glm::mat3(zcamera.GetCameraViewMatrix()));//去除相机的位移信息,只保留相机的旋转信息
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1_skybox.ID, "v_matrix"), 1, GL_FALSE, glm::value_ptr(viewM));
+//		glUniformMatrix4fv(glGetUniformLocation(myShader1_skybox.ID, "p_matrix"), 1, GL_FALSE, glm::value_ptr(zcamera.GetCameraperspectiveMatrix()));
+//		glBindVertexArray(boxVAO);
+//		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
+//		glDrawArrays(GL_TRIANGLES, 0, 36);
+//		glDepthFunc(GL_LESS);
 //
 //		glfwSwapBuffers(window);	//此函数会交换颜色缓冲(它是存储着GLFW窗口每一个像素颜色值的大缓冲),它在这一迭代中被用来绘制,并且会作为输出显示在屏幕上
 //		glfwPollEvents();	//此函数检查有没有鼠标键盘窗口等触发事件,如果有并调用相应的回调函数

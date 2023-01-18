@@ -22,6 +22,14 @@ void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix,unsigned int DrawMode)
 	unsigned int normalNr = 1;
 	unsigned int heightNr = 1;
 	if (mTextures.size() > 0) {
+		inshader->SetInt(("material.texture_diffuse1"), 0);
+		inshader->SetInt(("material.texture_diffuse2"), 0);
+		inshader->SetInt(("material.texture_diffuse3"), 0);
+		inshader->SetInt(("material.texture_specular1"), 0);
+		inshader->SetInt(("material.texture_specular2"), 0);
+		inshader->SetInt(("material.texture_specular3"), 0);
+		inshader->SetInt(("material.texture_normal1"), 0);
+		inshader->SetInt(("material.texture_height1"), 0);
 		//绑定相应的纹理单元
 		for (unsigned int i = 0; i < mTextures.size(); i++) {
 			glActiveTexture(GL_TEXTURE0 + i);//激活相应的纹理单元
@@ -91,6 +99,14 @@ void ZMesh::DrawWithCubeShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned i
 	unsigned int heightNr = 1;
 	unsigned int i = 0;
 	if (mTextures.size() > 0) {
+		inshader->SetInt(("material.texture_diffuse1"), 0);
+		inshader->SetInt(("material.texture_diffuse2"), 0);
+		inshader->SetInt(("material.texture_diffuse3"), 0);
+		inshader->SetInt(("material.texture_specular1"), 0);
+		inshader->SetInt(("material.texture_specular2"), 0);
+		inshader->SetInt(("material.texture_specular3"), 0);
+		inshader->SetInt(("material.texture_normal1"), 0);
+		inshader->SetInt(("material.texture_height1"), 0);
 		//绑定相应的纹理单元
 		for (i = 0; i < mTextures.size(); ++i) {
 			glActiveTexture(GL_TEXTURE0 + i);//激活相应的纹理单元
@@ -191,6 +207,53 @@ void ZMesh::SampleDraw(Shader* inshader)
 	glBindVertexArray(mVAO);
 	glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+}
+
+unsigned int ZMesh::TextureFromFile(const string& filename, bool gamma)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	int width, height, nrComponents;
+	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+	if (data) {
+		GLenum format;
+		if (nrComponents == 1)format = GL_RED;
+		else if (nrComponents == 3)format = GL_RGB;
+		else if (nrComponents == 4)format = GL_RGBA;
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	}
+	else {
+		cout << "Texture failed to load at path: " << filename << endl;
+		stbi_image_free(data);
+	}
+	return textureID;
+}
+
+void ZMesh::AddHeightMap(string heightmapPath)
+{
+	unsigned int texID = TextureFromFile(heightmapPath);
+	ZTexture heiTex;
+	heiTex.id = texID;
+	heiTex.type = "texture_height";
+	heiTex.path = heightmapPath;
+	mTextures.push_back(heiTex);
+}
+
+void ZMesh::AddHeightMap(unsigned int texID)
+{
+	ZTexture diffTex;
+	diffTex.id = texID;
+	diffTex.type = "texture_diffuse";
+	diffTex.path = "NO";
+	mTextures.push_back(diffTex);
 }
 
 unsigned int ZMesh::GetVAO()
@@ -406,7 +469,7 @@ unsigned int ZModel::LoadCubeMap(vector<string> textures_faces)
 void ZModel::LoadModel(string path)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);//以三角形读取,翻转UV的V向,并计算切线和副切线
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 		cout << "ERROR::ASSIMP::" << importer.GetErrorString() << endl;
 		return;
@@ -450,8 +513,14 @@ ZMesh ZModel::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 nodeM,gl
 		vertex.position.x = mesh->mVertices[i].x;
 		vertex.position.y = mesh->mVertices[i].y;
 		vertex.position.z = mesh->mVertices[i].z;
+		vertex.tangent.x = mesh->mTangents[i].x;//切线
+		vertex.tangent.y = mesh->mTangents[i].y;
+		vertex.tangent.z = mesh->mTangents[i].z;
+		vertex.bitangent.x = mesh->mBitangents[i].x;//副切线
+		vertex.bitangent.y = mesh->mBitangents[i].y;
+		vertex.bitangent.z = mesh->mBitangents[i].z;
 		if (mesh->HasNormals()) {
-			vertex.normal.x = mesh->mNormals[i].x;
+			vertex.normal.x = mesh->mNormals[i].x;//法线
 			vertex.normal.y = mesh->mNormals[i].y;
 			vertex.normal.z = mesh->mNormals[i].z;
 		}

@@ -175,6 +175,10 @@
     <ClCompile Include="openGLLearning34_ShadowMap.cpp" />
     <ClCompile Include="openGLLearning36_PointShadow.cpp" />
     <ClCompile Include="openGLLearning37_NormalMapping.cpp" />
+    <ClCompile Include="openGLLearning38_ParallaxMapping.cpp" />
+    <ClCompile Include="openGLLearning39_HDR.cpp" />
+    <ClCompile Include="openGLLearning40_Bloom.cpp" />
+    <ClCompile Include="openGLLearning41_DeferredShading.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
     <ClCompile Include="ZDirectionLight.cpp" />

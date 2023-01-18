@@ -19,8 +19,8 @@ struct ZVertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 uv;
-	glm::vec3 tangent;
-	glm::vec3 bitangent;
+	glm::vec3 tangent;//Assimp加载器实现了切线和副切线的计算,我们不用根据顶点的坐标和UV手工计算了,然后可以直接使用他们来构造切线空间从而使用法线贴图
+	glm::vec3 bitangent;//对于副切线我们通常要使用施密特正交化来计算出正交的切线空间,所以一般情况下我们用不着这个读取进来的副切线
 };
 //自定义一个texture结构
 struct ZTexture
@@ -53,6 +53,11 @@ public:
 	void DrawDepth(Shader* inshader);
 	//忽略贴图,只读取场景中的顶点位置信息绘制
 	void SampleDraw(Shader* inshader);
+	//从硬盘中图片生成纹理
+	unsigned int TextureFromFile(const string& filename, bool gamma = false);
+	//额外添加高度贴图
+	void AddHeightMap(string heightmapPath);
+	void AddHeightMap(unsigned int texID);
 
 	unsigned int GetVAO();
 
