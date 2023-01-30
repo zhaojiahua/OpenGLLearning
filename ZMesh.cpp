@@ -55,6 +55,28 @@ void ZMesh::Draw(Shader* inshader,glm::mat4 inMMatrix,unsigned int DrawMode)
 	glActiveTexture(GL_TEXTURE0);
 }
 
+void ZMesh::DeferredDraw(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode)
+{
+	if (mTextures.size() > 0) {
+		inshader->SetInt("texture_diffuse", 0);
+		inshader->SetInt("texture_specular", 0);
+		inshader->SetInt("texture_normal", 0);
+		//绑定相应的纹理单元
+		for (unsigned int i = 0; i < mTextures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);//激活相应的纹理单元
+			glBindTexture(GL_TEXTURE_2D, mTextures[i].id);
+			string name = mTextures[i].type;
+			inshader->SetInt(name.c_str(), i);
+		}
+	}
+	inshader->SetMat4f("m_matrix", inMMatrix * mMatrix);
+	//绘制网格
+	glBindVertexArray(mVAO);
+	glDrawElements(DrawMode, mIndices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
+}
+
 void ZMesh::DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode,unsigned int shadowmap)
 {
 	unsigned int diffuseNr = 1;
@@ -249,6 +271,9 @@ void ZMesh::AddHeightMap(string heightmapPath)
 
 void ZMesh::AddHeightMap(unsigned int texID)
 {
+	for (auto tex : mTextures) {
+		if (tex.id == texID)return;
+	}
 	ZTexture diffTex;
 	diffTex.id = texID;
 	diffTex.type = "texture_diffuse";
@@ -332,6 +357,37 @@ void ZModel::Draw(Shader* inshader, glm::mat4 inMMatrix,glm::vec3 cameraPosition
 		for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
 			rit->Draw(inshader, inMMatrix, DrawMode);
 		}
+}
+
+void ZModel::DeferredDraw(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode)
+{
+	//给物体按距离排序,渲染的时候由远及近以此绘制
+	vector<ZMesh>sorted;
+	if (meshes.size() > 0) {
+		sorted.push_back(meshes[0]);
+		for (unsigned int i = 1; i < meshes.size(); i++) {//根据distance的键值从低到高存储每一个mesh(根据distance距离值由大到小排列)
+			float distance = glm::length(cameraPosition - meshes[i].mPosition);
+			//(根据distance距离值由大到小排列)
+			vector<ZMesh>::iterator temp_it = sorted.begin();
+			while (true) {
+				float old_distance = glm::length(cameraPosition - temp_it->mPosition);
+				if (distance >= old_distance) {
+					sorted.insert(temp_it, meshes[i]);
+					break;//跳出循环
+				}
+				if (temp_it == sorted.end()) {//说明走到了最后
+					sorted.push_back(meshes[i]);
+					break;//跳出循环
+				}
+				temp_it++;
+			}
+		}
+	}
+	//顺序绘制每一个mesh
+	//cout << sorted.size() << endl;
+	for (vector<ZMesh>::iterator rit = sorted.begin(); rit != sorted.end(); rit++) {
+		rit->DeferredDraw(inshader, inMMatrix, DrawMode);
+	}
 }
 
 void ZModel::DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode, unsigned int shadowmap)

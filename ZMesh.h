@@ -43,6 +43,8 @@ public:
 	ZMesh(vector<ZVertex> vertices, vector<unsigned int>indices, vector<ZTexture>textures);
 	//绘制函数
 	void Draw(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode);
+	//渲染几何信息到gBuffer
+	void DeferredDraw(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode);
 	//绘制带阴影
 	void DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, unsigned int DrawMode,unsigned int shadowmap);
 	//绘制带阴影(立方体阴影深度贴图)
@@ -75,6 +77,7 @@ class ZModel
 public:
 	ZModel(const char* path);
 	void Draw(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition,unsigned int DrawMode);
+	void DeferredDraw(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition,unsigned int DrawMode);
 	void DrawWithShadow(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode, unsigned int shadowmap);
 	void DrawWithCubeShadow(Shader* inshader, glm::mat4 inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode, unsigned int shadowmap);
 	void DrawInstance(Shader* inshader, unsigned int amount, glm::mat4* inMMatrix, glm::vec3 cameraPosition, unsigned int DrawMode);

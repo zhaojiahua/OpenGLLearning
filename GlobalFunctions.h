@@ -95,7 +95,29 @@ void ProcessInput(GLFWwindow* inWind, Shader inshader) {
 		zcamera.MoveDownWard();
 	}
 }
-
+void ProcessInput(GLFWwindow* inWind) {
+	if (glfwGetKey(inWind, GLFW_KEY_ESCAPE) == GLFW_PRESS) {//如果检测到ESC键被按下
+		glfwSetWindowShouldClose(inWind, true);	//设置glfwWindowShouldClose为TRUE
+	}
+	if (glfwGetKey(inWind, GLFW_KEY_W) == GLFW_PRESS) {//W键按下相机向前运动
+		zcamera.MoveForward();
+	}
+	if (glfwGetKey(inWind, GLFW_KEY_S) == GLFW_PRESS) {//S键按下相机向后运动
+		zcamera.MoveBackward();
+	}
+	if (glfwGetKey(inWind, GLFW_KEY_A) == GLFW_PRESS) {//A键按下相机向左运动
+		zcamera.MoveLeft();
+	}
+	if (glfwGetKey(inWind, GLFW_KEY_D) == GLFW_PRESS) {//D键按下相机向右运动
+		zcamera.MoveRight();
+	}
+	if (glfwGetKey(inWind, GLFW_KEY_SPACE) == GLFW_PRESS) {//空格键按下相机向上运动
+		zcamera.MoveUpWard();
+	}
+	if (glfwGetKey(inWind, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {//shift+空格键按下相机向下运动
+		zcamera.MoveDownWard();
+	}
+}
 //加载天空盒子
 unsigned int LoadCubeMap(vector<string> textures_faces) {
 	unsigned int texture_box;

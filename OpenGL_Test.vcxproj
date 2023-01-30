@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="deferredRenderTest.cpp" />
     <ClCompile Include="Dependencys\src\glad.c" />
     <ClCompile Include="openGLLearning03_GLSL_Shader.cpp" />
     <ClCompile Include="openGLLearning02_HelloTriangle.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="openGLLearning39_HDR.cpp" />
     <ClCompile Include="openGLLearning40_Bloom.cpp" />
     <ClCompile Include="openGLLearning41_DeferredShading.cpp" />
+    <ClCompile Include="openGLLearning41_DeferredShading2.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
     <ClCompile Include="ZDirectionLight.cpp" />
