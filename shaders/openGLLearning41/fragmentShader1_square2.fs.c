@@ -13,6 +13,6 @@ uniform Material material;
 
 void main()
 {	
-	vec3 hdrColor=texture(material.texture_diffuse1,vertexUV).rgb;
-	fragColor=vec4(hdrColor,1.0);
+	vec3 tempcolor=vec3(texture(material.texture_diffuse1,vertexUV).a);
+	fragColor=vec4(tempcolor,1.0);
 }

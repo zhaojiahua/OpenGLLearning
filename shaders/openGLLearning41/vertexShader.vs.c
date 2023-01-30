@@ -23,5 +23,6 @@ void main()
 	gl_Position=p_matrix*v_matrix*m_matrix*vec4(aPos,1.0f);
 	vertexUV=aUV;
 	normal=mat3(transpose(inverse(m_matrix)))*aN;//法线校正
-	fragPos=vec3(m_matrix*vec4(aPos,1.0f));//去除空间位移后只保留旋转信息
+	fragPos=(m_matrix*vec4(aPos,1.0)).xyz;
+	//fragPos=vec3(m_matrix*vec4(aPos,1.0f));//去除空间位移后只保留旋转信息
 }
