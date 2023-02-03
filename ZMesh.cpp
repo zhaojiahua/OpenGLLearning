@@ -247,7 +247,7 @@ unsigned int ZMesh::TextureFromFile(const string& filename, bool gamma)
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		stbi_image_free(data);
@@ -257,6 +257,30 @@ unsigned int ZMesh::TextureFromFile(const string& filename, bool gamma)
 		stbi_image_free(data);
 	}
 	return textureID;
+}
+
+unsigned int ZMesh::TextureFromFile_f(const string& filename)
+{
+	stbi_set_flip_vertically_on_load(true);//Y方向翻转一下
+	unsigned int hdrtextureID;
+	glGenTextures(1, &hdrtextureID);
+	int width, height, nrComponents;
+	float* data = stbi_loadf(filename.c_str(), &width, &height, &nrComponents, 0);
+	if (data) {
+		glBindTexture(GL_TEXTURE_2D, hdrtextureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		stbi_image_free(data);
+	}
+	else {
+		cout << "Texture failed to load at path: " << filename << endl;
+		stbi_image_free(data);
+	}
+	return hdrtextureID;
 }
 
 void ZMesh::AddHeightMap(string heightmapPath)

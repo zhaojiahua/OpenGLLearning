@@ -165,6 +165,15 @@
     <ClCompile Include="openGLLearning41_DeferredShading2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="openGLLearning42_SSAO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning43_PBR.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning44_IBL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

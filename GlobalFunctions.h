@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <filesystem>
+#include <random>
 
 #include "Shader.h"
 #include "ZCamera.h"
@@ -139,4 +140,9 @@ unsigned int LoadCubeMap(vector<string> textures_faces) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	return texture_box;
+}
+
+//加速差值函数(把线性分布函数曲线下压成抛物线)
+GLfloat AccelerateLerp(GLfloat a, GLfloat b, GLfloat f) {
+	return a + f * (b - a);
 }

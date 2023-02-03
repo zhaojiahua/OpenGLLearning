@@ -57,6 +57,8 @@ public:
 	void SampleDraw(Shader* inshader);
 	//从硬盘中图片生成纹理
 	unsigned int TextureFromFile(const string& filename, bool gamma = false);
+	//将HDR空间的图片值映射到一个浮点数列表(默认情况下每个通道32位,每个颜色三个通道)
+	unsigned int TextureFromFile_f(const string& filename);
 	//额外添加高度贴图
 	void AddHeightMap(string heightmapPath);
 	void AddHeightMap(unsigned int texID);

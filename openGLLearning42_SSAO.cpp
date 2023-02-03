@@ -35,8 +35,9 @@
 //	glfwSetScrollCallback(window, Mouse_scroll_callback);//设置滚轮滚动回调函数
 //
 //	//加载模型数据
-//	ZModel testModel("assets/models/nanosuit/nanosuits.fbx");
+//	//ZModel testModel("assets/models/nanosuit/nanosuits.fbx");
 //	//ZModel testModel("assets/models/nanosuit/nanosuit.fbx");
+//	ZModel testModel("assets/models/nanosuit/nanosuit_plane.fbx");
 //	//ZModel testModel("assets/models/box.fbx");
 //	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
 //	//ZModel testModel("assets/models/woodfloor/floor.fbx");
@@ -51,17 +52,16 @@
 //	//cout << testModel.meshes[6].mTextures.size() << endl;
 //	//cout << testModel.meshes.size() << endl;
 //
-//	//配置点光源(蓝色调)(为了便于观察效果我们把点光源衰减程度降低)
 //	vector<ZPointLight> pointlights;
 //	srand(7);
 //	for (unsigned int i = 0; i < 32; i++) {
-//		float posx = (rand() % 100 / 100.0f) * 80.0 - 40.0;
-//		float posy = (rand() % 100 / 100.0f) * 30.0 - 10.0;
-//		float posz = (rand() % 100 / 100.0f) * 80.0 - 30.0;
+//		float posx = (rand() % 100 / 100.0f) * 200.0 - 100.0;
+//		float posy = (rand() % 100 / 100.0f) * 60.0 - 10.0;
+//		float posz = (rand() % 100 / 100.0f) * 320.0 - 230.0;
 //		float colorr = (rand() % 100 / 200.0f) + 0.5f;
 //		float colorg = (rand() % 100 / 200.0f) + 0.5f;
 //		float colorb = (rand() % 100 / 200.0f) + 0.5f;
-//		ZPointLight tempPointLight(glm::vec4(colorr, colorg, colorb, 1.0f), glm::vec3(posx, posy, posz), 1.0f, 0.03f, 0.01f);
+//		ZPointLight tempPointLight(glm::vec4(colorr, colorg, colorb, 1.0f), glm::vec3(posx, posy, posz), 1.0f, 0.01f, 0.002f);
 //		pointlights.push_back(tempPointLight);
 //	}
 //
@@ -131,7 +131,7 @@
 //	unsigned int cubemap = LoadCubeMap(faces);
 //
 //	//构建一个方片用来存放最终渲染的光照阶段图
-//	float rectVertices[] = { 
+//	float rectVertices[] = {
 //			-1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
 //			-1.0f, -1.0f, 0.0f,	0.0f, 0.0f,
 //			1.0f, 1.0f, 0.0f,		1.0f, 1.0f,
@@ -155,12 +155,17 @@
 //	Shader myShader1_skybox("shaders/openGLLearning23/vertexShader_skybox.vs.c", "shaders/openGLLearning23/fragmentShader1_skybox.fs.c");//渲染天空盒子用的
 //	Shader myShader1_square("shaders/openGLLearning41/vertexShader_square.vs.c", "shaders/openGLLearning41/fragmentShader1_square.fs.c");
 //	Shader myShader1_square2("shaders/openGLLearning41/vertexShader_square.vs.c", "shaders/openGLLearning41/fragmentShader1_square2.fs.c");
-//	Shader myShader1("shaders/openGLLearning41/vertexShader.vs.c", "shaders/openGLLearning41/fragmentShader1.fs.c");
-//	Shader myShader2("shaders/openGLLearning41/vertexShader2.vs.c", "shaders/openGLLearning41/fragmentShader2.fs.c");
+//	Shader myShader1("shaders/openGLLearning42/vertexShader.vs.c", "shaders/openGLLearning42/fragmentShader1.fs.c");
+//	Shader myShader2("shaders/openGLLearning42/vertexShader2.vs.c", "shaders/openGLLearning42/fragmentShader2.fs.c");
+//	Shader myShaderSSAO("shaders/openGLLearning42/vertexShader2.vs.c", "shaders/openGLLearning42/fragmentShader1_ssao.fs.c");
 //
 //	//设置采样器对应的纹理单元
 //	myShader1_skybox.Use();
 //	myShader1_skybox.SetInt("cubemap", 0);
+//	//设置shader
+//	myShader1.Use();
+//	myShader1.SetFloat("near",zcamera.near);
+//	myShader1.SetFloat("far",zcamera.far);
 //
 //	////////////////////////////////////////////////////////////////////////////////////生成一个gBuffer用来存储渲染得到的几何信息
 //	GLuint gBuffer;
@@ -170,9 +175,11 @@
 //	GLuint gPosition, gNormal, gAlbedoSpec;
 //	glGenTextures(1, &gPosition);
 //	glBindTexture(GL_TEXTURE_2D, gPosition);
-//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);//alpha通道存储深度信息,并且我们用浮点型数据,数值不会被限制在0-1之间
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 //	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
 //	//生成一张纹理附加颜色缓冲,存放法线缓冲数据
 //	glGenTextures(1, &gNormal);
@@ -198,7 +205,7 @@
 //	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
 //	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
 //	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "framebuffer not complete" << endl;
+//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "gBuffer not complete" << endl;
 //	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //
 //	////////////////////////////////////////////////////////////////////////////////////生成一个FrameBuffer用来存储光照阶段渲染得到颜色信息
@@ -206,26 +213,35 @@
 //	glGenFramebuffers(1, &finalBuffer);
 //	glBindFramebuffer(GL_FRAMEBUFFER, finalBuffer);
 //	GLuint diffusetex;
-//	glGenTextures(1,&diffusetex);
+//	glGenTextures(1, &diffusetex);
 //	glBindTexture(GL_TEXTURE_2D, diffusetex);
 //	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 //	glBindTexture(GL_TEXTURE_2D, 0);
 //	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffusetex, 0);
-//	//添加深度缓冲否则不完整
-//	GLuint depthtex;
-//	glGenRenderbuffers(1, &depthtex);
-//	glBindRenderbuffer(GL_RENDERBUFFER, depthtex);
-//	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
-//	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthtex);
-//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "framebuffer not complete" << endl;
+//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "finalBuffer not complete" << endl;
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//
+//	////////////////////////////////////////////////////////////////////////////////////生成一个FrameBuffer用来存储SSAO阶段的结果
+//	GLuint ssaoFBO;
+//	glGenFramebuffers(1, &ssaoFBO);
+//	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+//	GLuint ssaoColorTex;
+//	glGenTextures(1, &ssaoColorTex);
+//	glBindTexture(GL_TEXTURE_2D, ssaoColorTex);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//	glBindTexture(GL_TEXTURE_2D, 0);
+//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorTex, 0);
+//	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "ssaoFBO not complete" << endl;
 //	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //
 //	glClearColor(0.1f, 0.21f, 0.2f, 1.0f);	//设置颜色缓冲区的颜色值
 //
 //	//设置四个方片的位置
-//	glm::mat4 squareMMs[5] = { glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f) };
+//	glm::mat4 squareMMs[6] = { glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f) };
 //	squareMMs[0] = glm::scale(squareMMs[0], glm::vec3(0.2f));
 //	squareMMs[0] = glm::translate(squareMMs[0], glm::vec3(-52.0f, 37.0f, -80.0f));
 //	squareMMs[1] = glm::scale(squareMMs[1], glm::vec3(0.2f));
@@ -234,8 +250,40 @@
 //	squareMMs[2] = glm::translate(squareMMs[2], glm::vec3(-52.0f, -37.0f, -80.0f));
 //	squareMMs[3] = glm::scale(squareMMs[3], glm::vec3(0.2f));
 //	squareMMs[3] = glm::translate(squareMMs[3], glm::vec3(52.0f, -37.0f, -80.0f));
-//	squareMMs[4] = glm::scale(squareMMs[4], glm::vec3(0.2f));
+//	squareMMs[4] = glm::scale(squareMMs[4], glm::vec3(0.4f));
 //	squareMMs[4] = glm::translate(squareMMs[4], glm::vec3(0.0f, 0.0f, 40.0f));
+//	squareMMs[5] = glm::scale(squareMMs[5], glm::vec3(0.2f));
+//	squareMMs[5] = glm::translate(squareMMs[5], glm::vec3(0.0f, 50.0f, 80.0f));
+//
+//	//在切线空间内生成采样核心(拥有最大采样值64)
+//	uniform_real_distribution<GLfloat> U(0.0f, 1.0f);//随机浮点数范围在0.0-1.0之间
+//	default_random_engine e;//随机引擎
+//	vector<glm::vec3> ssaoKernels;
+//	for (unsigned int i = 0; i < 64; i++) {
+//		glm::vec3 tempvec(U(e) * 2.0f - 1.0f, U(e) * 2.0f - 1.0f, U(e));//在半球方向内生成一个随机向量
+//		tempvec = glm::normalize(tempvec);
+//		tempvec *= U(e);//大小也随机
+//		GLfloat scale = GLfloat(i) / 64.0;
+//		scale = AccelerateLerp(0.1f, 1.0f, scale * scale);//把离球心距离成线性分布的位置向球心拉近
+//		tempvec *= scale;
+//		ssaoKernels.push_back(tempvec);
+//	}
+//	//对场景中每个片段创建一个随机旋转向量,我们可以创建一个小的纹理平铺到屏幕上
+//	//首先创建一个4X4的朝向切线空间平面法线的随机旋转向量数组
+//	vector<glm::vec3> ssaoNoise;
+//	for (GLuint i = 0; i < 16; i++) {
+//		glm::vec3 noise(U(e) * 2.0f - 1.0f, U(e) * 2.0f - 1.0f, 0.0f);
+//		ssaoNoise.push_back(noise);
+//	}
+//	//然后创建一个包含随机旋转向量的4X4纹理并把随机旋转向量数据注入
+//	GLuint noiseTex;
+//	glGenTextures(1,&noiseTex);
+//	glBindTexture(GL_TEXTURE_2D,noiseTex);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+//	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 //
 //	//保持渲染循环
 //	while (!glfwWindowShouldClose(window)) {	//如果检测到GLFW要求被关闭就结束循环
@@ -262,10 +310,34 @@
 //		testModel.DeferredDraw(&myShader1, glm::mat4(1.0f), zcamera.cameraPos, GL_TRIANGLES);
 //		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //
+//		//使用gBuffer中的数据渲染ssao纹理到ssaoFBO的ssaoColorTex中
+//		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+//		glClear(GL_COLOR_BUFFER_BIT);
+//		myShaderSSAO.Use();
+//		glActiveTexture(GL_TEXTURE0);
+//		glBindTexture(GL_TEXTURE_2D, gPosition);
+//		glActiveTexture(GL_TEXTURE1);
+//		glBindTexture(GL_TEXTURE_2D, gNormal);
+//		glActiveTexture(GL_TEXTURE2);
+//		glBindTexture(GL_TEXTURE_2D, noiseTex);
+//		myShaderSSAO.SetInt("gPosition", 0);
+//		myShaderSSAO.SetInt("gNormal", 1);
+//		myShaderSSAO.SetInt("noiseTex", 2);
+//		myShaderSSAO.SetMat4f("p_matrix",zcamera.GetCameraperspectiveMatrix());
+//		myShaderSSAO.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
+//		myShaderSSAO.SetVec2f("noiseScale", glm::vec2(screenWidth / 4.0f, screenHeight / 4.0f));
+//		for (unsigned int i = 0; i < 64; i++) {
+//			myShaderSSAO.SetVec3f("samples[" + to_string(i) + "]", ssaoKernels[i]);
+//		}
+//		glBindVertexArray(rectVAO);
+//		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+//		glBindVertexArray(0);
+//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//
 //		//复制gBuffer中的深度缓冲到finalBuffer中
-//		glBindFramebuffer(GL_READ_FRAMEBUFFER,gBuffer);
-//		glBindFramebuffer(GL_DRAW_FRAMEBUFFER,finalBuffer);
-//		glBlitFramebuffer(0,0,screenWidth,screenHeight,0,0,screenWidth,screenHeight,GL_DEPTH_BUFFER_BIT,GL_NEAREST);
+//		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+//		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, finalBuffer);
+//		glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 //		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //
 //		//渲染场景到finalBuffer中
@@ -280,9 +352,12 @@
 //		glBindTexture(GL_TEXTURE_2D, gNormal);
 //		glActiveTexture(GL_TEXTURE2);
 //		glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+//		glActiveTexture(GL_TEXTURE3);
+//		glBindTexture(GL_TEXTURE_2D, ssaoColorTex);
 //		myShader2.SetInt("gPosition", 0);
 //		myShader2.SetInt("gNormal", 1);
 //		myShader2.SetInt("gAlbedoSpec", 2);
+//		myShader2.SetInt("ssaoTex", 3);
 //		myShader2.SetVec3f("viewPos", zcamera.cameraPos);
 //		for (unsigned int i = 0; i < 32; i++) {
 //			myShader2.SetVec3f("pointlights[" + to_string(i) + "].position", pointlights[i].mLightPosition);
@@ -303,9 +378,8 @@
 //			glm::mat4 tempMM(1.0f);
 //			tempMM = glm::scale(tempMM, glm::vec3(0.5f));
 //			tempMM = glm::translate(tempMM, pointlights[i].mLightPosition);
-//			testModel_Light.Draw(&myShader1_light, tempMM,zcamera.cameraPos,GL_TRIANGLES);
+//			testModel_Light.Draw(&myShader1_light, tempMM, zcamera.cameraPos, GL_TRIANGLES);
 //		}
-//		//glEnable(GL_DEPTH_TEST);
 //		glBindFramebuffer(GL_FRAMEBUFFER, 0);//场景渲染完成解绑浮点缓冲区
 //
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//清除默认帧缓冲区的颜色缓冲和深度缓冲
@@ -320,6 +394,8 @@
 //		testModel_square.Draw(&myShader1_square, squareMMs[1], zcamera.cameraPos, GL_TRIANGLES);
 //		glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 //		testModel_square.Draw(&myShader1_square, squareMMs[2], zcamera.cameraPos, GL_TRIANGLES);
+//		glBindTexture(GL_TEXTURE_2D, ssaoColorTex);
+//		testModel_square.Draw(&myShader1_square, squareMMs[5], zcamera.cameraPos, GL_TRIANGLES);
 //		myShader1_square2.Use();
 //		myShader1_square2.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
 //		myShader1_square2.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
