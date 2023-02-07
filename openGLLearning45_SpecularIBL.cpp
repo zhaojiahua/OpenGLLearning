@@ -139,7 +139,7 @@ int main()
 	Shader myShader2_hdr2cubemap("shaders/openGLLearning45/vertexShader_hdr2cubemap.vs.c", "shaders/openGLLearning45/fragmentShader1_hdr2cubemap.fs.c");
 	Shader myShader2_irradiancemap("shaders/openGLLearning45/vertexShader_hdr2cubemap.vs.c", "shaders/openGLLearning45/fragmentShader1_irradiancemap.fs.c");
 	Shader myShader2_prefiltermap("shaders/openGLLearning45/vertexShader_hdr2cubemap.vs.c", "shaders/openGLLearning45/fragmentShader1_prefiltermap.fs.c");
-	Shader myShader2_LUTmap("shaders/openGLLearning45/vertexShader_hdr2cubemap.vs.c", "shaders/openGLLearning45/fragmentShader1_LUTmap.fs.c");
+	Shader myShader2_LUTmap("shaders/openGLLearning45/vertexShader_square.vs.c", "shaders/openGLLearning45/fragmentShader1_LUTmap.fs.c");
 
 	//设置采样器对应的纹理单元
 	myShader1_skybox.Use();
