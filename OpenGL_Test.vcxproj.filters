@@ -171,7 +171,10 @@
     <ClCompile Include="openGLLearning43_PBR.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="openGLLearning44_IBL.cpp">
+    <ClCompile Include="openGLLearning44_diffuseIBL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLLearning45_SpecularIBL.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

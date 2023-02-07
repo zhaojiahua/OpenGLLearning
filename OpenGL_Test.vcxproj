@@ -183,7 +183,8 @@
     <ClCompile Include="openGLLearning41_DeferredShading2.cpp" />
     <ClCompile Include="openGLLearning42_SSAO.cpp" />
     <ClCompile Include="openGLLearning43_PBR.cpp" />
-    <ClCompile Include="openGLLearning44_IBL.cpp" />
+    <ClCompile Include="openGLLearning44_diffuseIBL.cpp" />
+    <ClCompile Include="openGLLearning45_SpecularIBL.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ZCamera.cpp" />
     <ClCompile Include="ZDirectionLight.cpp" />
