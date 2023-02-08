@@ -13,6 +13,6 @@ uniform mat4 p_matrix;
 void main()
 {
 	localPos=aPos;
-	gl_Position=p_matrix*v_matrix*m_matrix*vec4(aPos,1.0);
 	vertexUV=vec2(aUV.x,1-aUV.y);
+	gl_Position=p_matrix*v_matrix*m_matrix*vec4(aPos,1.0);
 }

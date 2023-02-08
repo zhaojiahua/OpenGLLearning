@@ -1,12 +1,25 @@
 #version 330 core
-#define PI 3.1415926535
+#define PI 3.14159265359
 
-in vec3 localPos;
 in vec2 vertexUV;
-out vec4 fragColor;
+out vec2 fragColor;
 
 uniform float roughness;//受roughness变化影响
 uniform samplerCube hdrcubemap;
+
+float RadicalInverse_VdC(int bits) 
+{
+     bits = (bits << 16) | (bits >> 16);
+     bits = ((bits & 0x55555555) << 1) | ((bits & 0xAAAAAAAA) >> 1);
+     bits = ((bits & 0x33333333) << 2) | ((bits & 0xCCCCCCCC) >> 2);
+     bits = ((bits & 0x0F0F0F0F) << 4) | ((bits & 0xF0F0F0F0) >> 4);
+     bits = ((bits & 0x00FF00FF) << 8) | ((bits & 0xFF00FF00) >> 8);
+     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+}
+vec2 Hammersley(int i, int N)
+{
+	return vec2(float(i)/float(N), RadicalInverse_VdC(i));
+}
 
 //生成低差异序列
 float VanDerCorpus(int n,int base){
@@ -69,7 +82,8 @@ vec2 IntegrateBRDF(float NdotV,float roughness){
 
 	const int SAMPLE_COUNT=1024;
 	for(int i=0;i<SAMPLE_COUNT;i++){
-		vec2 xi=HammersleyNoBitOps(i,SAMPLE_COUNT);
+		//vec2 xi=HammersleyNoBitOps(i,SAMPLE_COUNT);
+		vec2 xi=Hammersley(i,SAMPLE_COUNT);
 		vec3 H=ImportanceSampleGGX(xi,N,roughness);//生成采样的向量
 		vec3 L=normalize(2.0*dot(V,H)*H-V);//根据出射方向和法线算出光源方向
 
@@ -94,6 +108,6 @@ vec2 IntegrateBRDF(float NdotV,float roughness){
 void main()
 {	
 	vec2 brdfResult=IntegrateBRDF(vertexUV.x,vertexUV.y);
-	fragColor=vec4(brdfResult,0.0,1.0);
+	fragColor=brdfResult;
 	//fragColor=vec4(1.0,1.0,0.0,1.0);
 }

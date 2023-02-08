@@ -16,8 +16,14 @@ uniform mat4 p_matrix;
 
 void main()
 {
+	//vec3 Q1=dFdx(aPos);
+	//vec3 Q2=dFdy(aPos);
+	//vec2 st1=dFdx(aUV);
+	//vec2 st2=dFdy(aUV);
+
 	vec3 T=normalize(vec3(m_matrix*vec4(aT,0.0)));
 	vec3 N=normalize(vec3(m_matrix*vec4(aN,0.0)));
+	//vec3 T=normalize(Q1*st2.t-Q2*st1.t);
 	vec3 B=cross(T,N);
 	TBN=mat3(T,B,N);
 	gl_Position=p_matrix*v_matrix*m_matrix*vec4(aPos,1.0f);
