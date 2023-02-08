@@ -40,8 +40,8 @@ int main()
 	//ZModel testModel("assets/models/nanosuit/nanosuit_plane.fbx");
 	//ZModel testModel("assets/models/pbrpokeball/pokeball2.fbx");
 	//ZModel testModel("assets/models/pe/pe_main.obj");
-	//ZModel testModel("assets/models/pbrmetals/sphere.obj");
-	ZModel testModel("assets/models/tools/tool.obj");
+	ZModel testModel("assets/models/pbrmetals/sphere.obj");
+	//ZModel testModel("assets/models/tools/tool.obj");
 	ZModel testModel_box("assets/models/box.obj");
 	//ZModel testModel("assets/models/lowpolyscene/LowPolyWinterScene.obj");
 	//ZModel testModel("assets/models/woodfloor/floor.fbx");
@@ -122,14 +122,14 @@ int main()
 
 	//创建PBR贴图5张
 	GLuint albedomap, normalmap, metallicmap, roughnessmap, aomap;
-	albedomap = testModel.meshes[0].TextureFromFile("assets/models/tools/textures/Main_albedo.png", true);
-	normalmap = testModel.meshes[0].TextureFromFile("assets/models/tools/textures/Main_normal.png");
-	metallicmap = testModel.meshes[0].TextureFromFile("assets/models/tools/textures/Main_metallic.png");
-	roughnessmap = testModel.meshes[0].TextureFromFile("assets/models/tools/textures/Main_roughness.png");
-	aomap = testModel.meshes[0].TextureFromFile("assets/models/tools/textures/Main_ao.png");
+	albedomap = testModel.meshes[0].TextureFromFile("assets/models/pbrmetals/textures/Main_albedo.png", true);
+	normalmap = testModel.meshes[0].TextureFromFile("assets/models/pbrmetals/textures/Main_normal.png");
+	metallicmap = testModel.meshes[0].TextureFromFile("assets/models/pbrmetals/textures/Main_metallic.png");
+	roughnessmap = testModel.meshes[0].TextureFromFile("assets/models/pbrmetals/textures/Main_roughness.png");
+	aomap = testModel.meshes[0].TextureFromFile("assets/models/pbrmetals/textures/Main_ao.png");
 
 	//hdr贴图(等距柱状投影图)
-	GLuint hdrmap = testModel_box.meshes[0].TextureFromFile_f("assets/models/4KHDRIS/1.hdr");
+	GLuint hdrmap = testModel_box.meshes[0].TextureFromFile_f("assets/textures/4KHDRIS/5.hdr");
 
 	//创建着色器
 	Shader myShader1_light("shaders/openGLLearning37/vertexShader_forlight.vs.c", "shaders/openGLLearning37/fragmentShader1_forlight.fs.c");//渲染光源用的
@@ -139,7 +139,7 @@ int main()
 	Shader myShader2_hdr2cubemap("shaders/openGLLearning45/vertexShader_hdr2cubemap.vs.c", "shaders/openGLLearning45/fragmentShader1_hdr2cubemap.fs.c");
 	Shader myShader2_irradiancemap("shaders/openGLLearning45/vertexShader_hdr2cubemap.vs.c", "shaders/openGLLearning45/fragmentShader1_irradiancemap.fs.c");
 	Shader myShader2_prefiltermap("shaders/openGLLearning45/vertexShader_hdr2cubemap.vs.c", "shaders/openGLLearning45/fragmentShader1_prefiltermap.fs.c");
-	Shader myShader2_LUTmap("shaders/openGLLearning45/vertexShader_square.vs.c", "shaders/openGLLearning45/fragmentShader1_LUTmap.fs.c");
+	Shader myShader2_LUTmap("shaders/openGLLearning45/vertexShader_LUTmap.vs.c", "shaders/openGLLearning45/fragmentShader1_LUTmap.fs.c");
 
 	//设置采样器对应的纹理单元
 	myShader1_skybox.Use();
@@ -257,12 +257,13 @@ int main()
 	GLuint brdfLUTMap;
 	glGenTextures(1, &brdfLUTMap);
 	glBindTexture(GL_TEXTURE_2D, brdfLUTMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, 0);//分辨率512X512
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);//分辨率512X512
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)cout << "brdfBuffer not complete" << endl;
+	GLuint brdfLUTMap2 = testModel_box.meshes[0].TextureFromFile_f("assets/textures/brdfLUT.png");
 
 	//使用irradiance卷积着色器对hdr环境贴图卷积,并将环境漫反射积分结果渲染到irradianceMap中
 	glViewport(0, 0, 64, 64);//把视口分辨率设置64X64
@@ -350,22 +351,31 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, roughnessmap);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, aomap);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, perfilterMap);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, brdfLUTMap2);
 		myShader2.SetInt("texture_albedo", 0);
 		myShader2.SetInt("texture_normal", 1);
 		myShader2.SetInt("texture_metallic", 2);
 		myShader2.SetInt("texture_roughness", 3);
 		myShader2.SetInt("texture_ao", 4);
+		myShader2.SetInt("texture_irradiance", 5);
+		myShader2.SetInt("texture_perfilterMap", 6);
+		myShader2.SetInt("texture_brdfLUTMap", 7);
 		testModel.SampleDraw(&myShader2);
 
-		//渲染方片
-		myShader1_square.Use();
-		myShader1_square.SetVec3f("viewPos", zcamera.cameraPos);
-		myShader1_square.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
-		myShader1_square.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, brdfLUTMap);
-		myShader2.SetInt("material.texture_diffuse1", 0);
-		testModel_square.SampleDraw(&myShader1_square);
+		////渲染方片
+		//myShader1_square.Use();
+		//myShader1_square.SetVec3f("viewPos", zcamera.cameraPos);
+		//myShader1_square.SetMat4f("v_matrix", zcamera.GetCameraViewMatrix());
+		//myShader1_square.SetMat4f("p_matrix", zcamera.GetCameraperspectiveMatrix());
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, brdfLUTMap);
+		//myShader2.SetInt("material.texture_diffuse1", 0);
+		//testModel_square.SampleDraw(&myShader1_square);
 
 		//渲染天空盒子并且将深度写入关闭,这样盒子永远绘制在其他物体的背后
 		glDepthFunc(GL_LEQUAL);
@@ -376,9 +386,9 @@ int main()
 		glBindVertexArray(boxVAO);
 		glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap_forhdr);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap_forhdr);
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, perfilterMap);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, perfilterMap);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glDepthFunc(GL_LESS);
 
@@ -392,4 +402,3 @@ int main()
 	glfwTerminate();	//渲染结束后我们需要释放所有的分配资源,此函数可以完成
 	return 0;
 }
-
