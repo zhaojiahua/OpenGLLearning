@@ -137,8 +137,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BallObject.cpp" />
     <ClCompile Include="deferredRenderTest.cpp" />
     <ClCompile Include="Dependencys\src\glad.c" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameLeval.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="openGLLearning03_GLSL_Shader.cpp" />
     <ClCompile Include="openGLLearning02_HelloTriangle.cpp" />
     <ClCompile Include="openGLLearning01_HelloWindow.cpp" />
@@ -185,7 +189,14 @@
     <ClCompile Include="openGLLearning43_PBR.cpp" />
     <ClCompile Include="openGLLearning44_diffuseIBL.cpp" />
     <ClCompile Include="openGLLearning45_SpecularIBL.cpp" />
+    <ClCompile Include="openGLLearning46_Game_BreakOut.cpp" />
+    <ClCompile Include="ParticleGenerator.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="ScreenRect.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SpriteRender.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="ZCamera.cpp" />
     <ClCompile Include="ZDirectionLight.cpp" />
     <ClCompile Include="ZMesh.cpp" />
@@ -193,9 +204,20 @@
     <ClCompile Include="ZSpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BallObject.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameLeval.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GlobalFunctions.h" />
+    <ClInclude Include="GlobalFunctions_Game.h" />
+    <ClInclude Include="ParticleGenerator.h" />
+    <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="ScreenRect.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SpriteRender.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="ZCamera.h" />
     <ClInclude Include="ZDirectionLight.h" />
     <ClInclude Include="ZLight.h" />
