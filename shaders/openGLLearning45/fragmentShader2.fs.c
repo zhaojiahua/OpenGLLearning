@@ -80,20 +80,20 @@ float GeometrySmith(vec3 N, vec3 V,vec3 L,float roughness){
 void main()
 {
 	//从贴图采样颜色
-	//vec3 albedo=pow(texture(texture_albedo,vertexUV).rgb,vec3(2.2));//注意albedo贴图要从gamma空间校正
-	//float metallic=texture(texture_metallic,vertexUV).r;
-	//float roughness=texture(texture_roughness,vertexUV).r;
-	//float ao=texture(texture_ao,vertexUV).r;
+	vec3 albedo=pow(texture(texture_albedo,vertexUV).rgb,vec3(2.2));//注意albedo贴图要从gamma空间校正
+	float metallic=texture(texture_metallic,vertexUV).r;
+	float roughness=texture(texture_roughness,vertexUV).r;
+	float ao=texture(texture_ao,vertexUV).r;
 	//自定义材质
-	vec3 albedo=vec3(1.0,0.0,0.0);
-	float metallic=1.0;
-	float roughness=0.5;
-	float ao=1.0;
+	//vec3 albedo=vec3(1.0,0.0,0.0);
+	//float metallic=1.0;
+	//float roughness=0.5;
+	//float ao=1.0;
 	vec3 irradiance=texture(texture_irradiance,normal).rgb;//IBL漫反射
 
 
-	//vec3 N=LoadNormalFromMap();
-	vec3 N=normal;
+	vec3 N=LoadNormalFromMap();
+	//vec3 N=normal;
 	vec3 V=normalize(viewPos-fragPos);
 
 	vec3 R=reflect(-V,N);
