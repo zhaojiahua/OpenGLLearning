@@ -346,6 +346,42 @@ GLint Shader::GenFragmentShader(const char* fragmentShaderPath)
 	return success;
 }
 
+void Shader::Compile(const GLchar* vertexShaderCode, const GLchar* fragmentShaderCode, const GLchar* geometryShaderCode)
+{
+	GLuint vertexShader, fragmentShader, geometryShader;
+	//顶点着色器
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
+	glCompileShader(vertexShader);
+	CheckCompileErrors(vertexShader, "VERTEX");
+	//片元着色器
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
+	glCompileShader(fragmentShader);
+	CheckCompileErrors(fragmentShader, "FRAGMENT");
+	//几何着色器
+	if (geometryShaderCode != nullptr) {
+		geometryShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(geometryShader, 1, &geometryShaderCode, NULL);
+		glCompileShader(geometryShader);
+		CheckCompileErrors(geometryShader, "GEOMETRY");
+	}
+	ID = glCreateProgram();
+	glAttachShader(ID, vertexShader);
+	glAttachShader(ID, fragmentShader);
+	if (geometryShaderCode != nullptr) {
+		glAttachShader(ID, geometryShader);
+	}
+	glLinkProgram(ID);
+	CheckCompileErrors(ID,"PROGRAM");
+	//链接完成后删除shader
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+	if (geometryShaderCode != nullptr) {
+		glDeleteShader(geometryShader);
+	}
+}
+
 void Shader::Use()
 {
 	glUseProgram(ID);
@@ -420,6 +456,26 @@ void Shader::SetMat4f(const std::string& inname, glm::mat4 invalue) const
 void Shader::SetMat4f(const std::string& inname, int bTransp, glm::mat4 invalue) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, inname.c_str()), 1, bTransp, glm::value_ptr(invalue));
+}
+
+void Shader::CheckCompileErrors(GLuint object, std::string type)
+{
+	GLint success;
+	GLchar infoLog[1024];
+	if (type != "PROGRAM") {
+		glGetShaderiv(object, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(object, 1024, NULL, infoLog);
+			std::cout << "Shader: Compile-time error: Type" << type << "\n" << infoLog << "\n-------------------------------" << std::endl;
+		}
+		else{
+			glGetShaderiv(object, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(object, 1024, NULL, infoLog);
+				std::cout << "Shader: Link-time error: Type" << type << "\n" << infoLog << "\n-------------------------------" << std::endl;
+			}
+		}
+	}
 }
 
 

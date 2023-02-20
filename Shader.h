@@ -28,6 +28,8 @@ public:
 	GLint GenGeometryShader(const char* geometryShaderPath);
 	//生成片元着色器
 	GLint GenFragmentShader(const char* fragmentShaderPath);
+	//根据shader代码生成并编译着色器
+	void Compile(const GLchar* vertexShaderCode, const GLchar* fragmentShaderCode, const GLchar* geometryShaderCode);
 
 	//激活程序
 	void Use();
@@ -46,4 +48,8 @@ public:
 	void SetVec4f(const std::string& inname, glm::vec4 invalue) const;
 	void SetMat4f(const std::string& inname, glm::mat4 invalue) const;
 	void SetMat4f(const std::string& inname, int bTransp, glm::mat4 invalue) const;
+
+private:
+	//检查shader的编译链接等环节是否出错
+	void CheckCompileErrors(GLuint object, std::string type);
 };
