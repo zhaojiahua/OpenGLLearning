@@ -97,7 +97,7 @@ void Game::Init()
 
 	//音效
 	if (soundEngine) {
-		soundEngine->play2D("assets/sounds/BGM.mp3", true);//背景音乐,开启循环
+		soundEngine->play2D("assets/Breakout_Game/sounds/BGM.mp3", true);//背景音乐,开启循环
 	}
 }
 
@@ -233,9 +233,9 @@ void Game::DoCollision()
 				if (!brick.isSolid) {
 					brick.bDestroyed = GL_TRUE;
 					SpawnPowerUps(brick);//随机生成道具
-					soundEngine->play2D("assets/sounds/bleep.mp3");
+					soundEngine->play2D("assets/Breakout_Game/sounds/bleep.mp3");
 				}
-				else soundEngine->play2D("assets/sounds/solid.wav");
+				else soundEngine->play2D("assets/Breakout_Game/sounds/solid.wav");
 				//碰撞处理
 				screenRect->mShakeTime = 0.1f;
 				Direction dir = get<1>(collisionInfo);
@@ -275,7 +275,7 @@ void Game::DoCollision()
 		tempVelocity.y = -1 * abs(player_ball->velocity.y);
 		player_ball->velocity = glm::normalize(tempVelocity) * glm::length(player_ball->velocity);
 		player_ball->mStuck = player_ball->mSticky;
-		soundEngine->play2D("assets/sounds/bleep.wav");
+		soundEngine->play2D("assets/Breakout_Game/sounds/bleep.wav");
 	}
 
 	//道具和挡板之间的碰撞
@@ -286,7 +286,7 @@ void Game::DoCollision()
 				ActivePowerUp(powerup);
 				powerup.bDestroyed = GL_TRUE;
 				powerup.mActivated = GL_TRUE;
-				soundEngine->play2D("assets/sounds/powerup.wav");
+				soundEngine->play2D("assets/Breakout_Game/sounds/powerup.wav");
 			}
 		}
 	}
