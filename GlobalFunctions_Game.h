@@ -14,6 +14,8 @@
 #include "ResourceManager.h"
 #include "Game.h"
 
+#include <irrKlang.h>
+
 using namespace std;
 
 //全局变量

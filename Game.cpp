@@ -6,6 +6,7 @@
 #include "ParticleGenerator.h"
 
 #include <GLFW/glfw3.h>
+#include <irrKlang.h>
 
 //渲染器和挡板都是全局数据
 SpriteRender* renderer;
@@ -21,11 +22,18 @@ const GLfloat BALL_RADIUS = 12.5f;
 GLuint particle_num = 500;
 ParticleGenerator* particleGenerator;//粒子发射器
 
+//音频驱动器
+irrklang::ISoundEngine* soundEngine = irrklang::createIrrKlangDevice();
+
 Game::Game(GLuint width, GLuint height) :State(GAME_ACTIVE), Keys(), Width(width), Height(height)
 {}
 
 Game::~Game(){
 	delete(renderer);
+	delete(player_paddle);
+	delete(player_ball);
+	delete(particleGenerator);
+	delete(soundEngine);
 }
 
 void Game::Init()
@@ -86,6 +94,11 @@ void Game::Init()
 	ResourceManager::LoadTexture2D("assets/Breakout_Game/daoju/powerup_passthrough.png", GL_FALSE, "powerup_passthrough");
 	ResourceManager::LoadTexture2D("assets/Breakout_Game/daoju/powerup_speed.png", GL_FALSE, "powerup_speed");
 	ResourceManager::LoadTexture2D("assets/Breakout_Game/daoju/powerup_sticky.png", GL_FALSE, "powerup_sticky");
+
+	//音效
+	if (soundEngine) {
+		soundEngine->play2D("assets/sounds/BGM.mp3", true);//背景音乐,开启循环
+	}
 }
 
 void Game::ProcessInput(GLfloat dt)
@@ -217,8 +230,12 @@ void Game::DoCollision()
 			Collision collisionInfo = CheckCollision(brick, *player_ball);
 			if (get<0>(collisionInfo)) {//如果检测到碰撞
 				//cout << "collision" << endl;
-				if (!brick.isSolid) brick.bDestroyed = GL_TRUE;
-				SpawnPowerUps(brick);//随机生成道具
+				if (!brick.isSolid) {
+					brick.bDestroyed = GL_TRUE;
+					SpawnPowerUps(brick);//随机生成道具
+					soundEngine->play2D("assets/sounds/bleep.mp3");
+				}
+				else soundEngine->play2D("assets/sounds/solid.wav");
 				//碰撞处理
 				screenRect->mShakeTime = 0.1f;
 				Direction dir = get<1>(collisionInfo);
@@ -258,6 +275,7 @@ void Game::DoCollision()
 		tempVelocity.y = -1 * abs(player_ball->velocity.y);
 		player_ball->velocity = glm::normalize(tempVelocity) * glm::length(player_ball->velocity);
 		player_ball->mStuck = player_ball->mSticky;
+		soundEngine->play2D("assets/sounds/bleep.wav");
 	}
 
 	//道具和挡板之间的碰撞
@@ -268,6 +286,7 @@ void Game::DoCollision()
 				ActivePowerUp(powerup);
 				powerup.bDestroyed = GL_TRUE;
 				powerup.mActivated = GL_TRUE;
+				soundEngine->play2D("assets/sounds/powerup.wav");
 			}
 		}
 	}

@@ -36,6 +36,7 @@ int main() {
 	BreakoutGame.SetShaderBeforeRender();
 	GLfloat deltaTime = 0.0f;
 	GLfloat lastFrame = 0.0f;
+
 	//未检测到窗口关闭就一直保持游戏循环
 	while (!glfwWindowShouldClose(window)) {
 		//计算每帧之间的时间间隔
