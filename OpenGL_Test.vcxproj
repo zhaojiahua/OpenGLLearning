@@ -190,6 +190,7 @@
     <ClCompile Include="openGLLearning44_diffuseIBL.cpp" />
     <ClCompile Include="openGLLearning45_SpecularIBL.cpp" />
     <ClCompile Include="openGLLearning46_Game_BreakOut.cpp" />
+    <ClCompile Include="openGLLearning47_RenderOutImage.cpp" />
     <ClCompile Include="ParticleGenerator.cpp" />
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SpriteRender.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="stb_image_write.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="ZCamera.h" />
     <ClInclude Include="ZDirectionLight.h" />

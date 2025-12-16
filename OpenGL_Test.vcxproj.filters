@@ -210,6 +210,9 @@
     <ClCompile Include="PowerUp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="openGLLearning47_RenderOutImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -270,6 +273,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="PowerUp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image_write.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
